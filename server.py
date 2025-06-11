@@ -27,6 +27,5 @@ def serve_images(filename):
     """Servírování obrázků"""
     return send_from_directory('hejaWeb/images', filename)
 
-# Pro PythonAnywhere je důležité mít tuto podmínku
 if __name__ == '__main__':
     app.run(debug=True)

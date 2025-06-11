@@ -1,3 +1,20 @@
+Pro lokální vývoj je potřeba:
+- python
+- Flask (pip install flask)
+
+pak dát ve složce hejaWeb:
+python local_server.py
+
+pak to bude na localhostu:
+1. http://localhost:5000
+
+
+
+
+
+
+
+## dole info o tom templatu ale to sou sračky
 Phantom by HTML5 UP
 html5up.net | @ajlkn
 Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
