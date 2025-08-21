@@ -150,8 +150,8 @@ input, select, textarea {
 	}
 
 		a:hover {
-			border-bottom-color: transparent;
-			color: blanchedalmond !important;
+			border-bottom-color: black;
+			color: black !important;
 		}
 
 	strong, b {
@@ -2275,7 +2275,7 @@ input, select, textarea {
 
 		input[type="checkbox"]:focus + label:before,
 		input[type="radio"]:focus + label:before {
-			border-color: blanchedalmond;
+			border-color: black;
 			box-shadow: 0 0 0 1px #f2849e;
 		}
 
@@ -2350,16 +2350,19 @@ input, select, textarea {
 
 			.image.fit img {
 				width: 100%;
+                height: 100%;
 			}
 
 		.image.main {
 			display: block;
 			margin: 0 0 3em 0;
 			width: 100%;
+            height: 100%;
 		}
 
 			.image.main img {
 				width: 100%;
+                height: 100%;
 			}
 
 			@media screen and (max-width: 736px) {
@@ -2537,7 +2540,7 @@ input, select, textarea {
 			input[type="button"].primary:hover,
 			button.primary:hover,
 			.button.primary:hover {
-				background-color: blanchedalmond;
+				background-color: black;
 			}
 
 			input[type="submit"].primary:active,
@@ -2545,7 +2548,7 @@ input, select, textarea {
 			input[type="button"].primary:active,
 			button.primary:active,
 			.button.primary:active {
-				background-color: blanchedalmond;
+				background-color: black;
 			}
 
 		input[type="submit"].disabled, input[type="submit"]:disabled,
@@ -2594,6 +2597,7 @@ input, select, textarea {
 				position: relative;
 				display: block;
 				width: 100%;
+                height: 100%;
 				border-radius: 4px;
 				overflow: hidden;
 			}
@@ -2601,6 +2605,7 @@ input, select, textarea {
 				.tiles article > .image img {
 					display: block;
 					width: 100%;
+                    height: 100%;
 				}
 
 				.tiles article > .image:before {
@@ -2718,7 +2723,7 @@ input, select, textarea {
 			}
 
 			.tiles article.style4 > .image:before {
-				background-color: white;
+				background-color: black;
 			}
 
 			.tiles article.style5 > .image:before {
