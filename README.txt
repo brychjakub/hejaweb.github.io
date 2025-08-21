@@ -1,3 +1,5 @@
+https://brychjakub.github.io/hejaweb.github.io/index.html
+
 Pro lokální vývoj je potřeba:
 - python
 
