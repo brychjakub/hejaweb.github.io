@@ -151,7 +151,7 @@ input, select, textarea {
 
 		a:hover {
 			border-bottom-color: transparent;
-			color: #f2849e !important;
+			color: blanchedalmond !important;
 		}
 
 	strong, b {
@@ -2275,7 +2275,7 @@ input, select, textarea {
 
 		input[type="checkbox"]:focus + label:before,
 		input[type="radio"]:focus + label:before {
-			border-color: #f2849e;
+			border-color: blanchedalmond;
 			box-shadow: 0 0 0 1px #f2849e;
 		}
 
@@ -2537,7 +2537,7 @@ input, select, textarea {
 			input[type="button"].primary:hover,
 			button.primary:hover,
 			.button.primary:hover {
-				background-color: #f2849e;
+				background-color: blanchedalmond;
 			}
 
 			input[type="submit"].primary:active,
@@ -2545,7 +2545,7 @@ input, select, textarea {
 			input[type="button"].primary:active,
 			button.primary:active,
 			.button.primary:active {
-				background-color: #ee5f81;
+				background-color: blanchedalmond;
 			}
 
 		input[type="submit"].disabled, input[type="submit"]:disabled,
@@ -2706,11 +2706,11 @@ input, select, textarea {
 					}
 
 			.tiles article.style1 > .image:before {
-				background-color: #f2849e;
+				background-color: blanchedalmond;
 			}
 
 			.tiles article.style2 > .image:before {
-				background-color: #7ecaf6;
+				background-color: white;
 			}
 
 			.tiles article.style3 > .image:before {
@@ -2718,7 +2718,7 @@ input, select, textarea {
 			}
 
 			.tiles article.style4 > .image:before {
-				background-color: #c75b9b;
+				background-color: white;
 			}
 
 			.tiles article.style5 > .image:before {
@@ -2769,7 +2769,7 @@ input, select, textarea {
 
 		@media screen and (max-width: 1280px) {
 
-			.tiles {
+			.       tiles {
 				margin: -1.25em 0 0 -1.25em;
 			}
 
@@ -3359,7 +3359,6 @@ html { scroll-behavior: smooth; }
 }
 .tiles article:hover {
   transform: translateY(-4px) scale(1.01);
-  box-shadow: 0 14px 32px rgba(0,0,0,0.25);
 }
 .button.primary {
   box-shadow: 0 6px 18px rgba(255,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.05);
