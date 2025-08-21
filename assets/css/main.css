@@ -3327,3 +3327,51 @@ input, select, textarea {
 			}
 
 		}
+/* Custom overrides for Heja Boys vibe */
+html { scroll-behavior: smooth; }
+
+/* Watermark background with logo */
+#wrapper { position: relative; }
+#wrapper::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: url('../../images/logoFull.jpg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: min(80vmin, 700px);
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Subtle vibey shadows and hover */
+.box {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.box:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.22);
+}
+.tiles article {
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.tiles article:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 14px 32px rgba(0,0,0,0.25);
+}
+.button.primary {
+  box-shadow: 0 6px 18px rgba(255,255,255,0.1), inset 0 0 0 1px rgba(255,255,255,0.05);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.button.primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(255,255,255,0.2), inset 0 0 0 1px rgba(255,255,255,0.1);
+}
+
+/* Accent tint close to logo feel */
+:root {
+  --heja-accent: #c7c7c7;
+}
+a { color: var(--heja-accent); }

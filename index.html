@@ -46,19 +46,27 @@
 							<li><a href="alba.html">Alba</a></li>
 							<li><a href="merch.html">Merch</a></li>
 							<li><a href="hry.html">Hry</a></li>
-							<li><a href="onas.html">O nás</a></li>
-						</ul>
-					</nav>
+ 						<li><a href="onas.html">O nás</a></li>
+ 						<li><a href="pichejte-nas.html">Píchejte nás</a></li>
+ 					</ul>
+ 				</nav>
 
 				<!-- Main -->
 					<div id="main">
 						<div class="inner">
-							<header>
-								<h1>This is Phantom, a free, fully responsive site<br />
-								template designed by <a href="http://html5up.net">HTML5 UP</a>.</h1>
-								<p>Etiam quis viverra lorem, in semper lorem. Sed nisl arcu euismod sit amet nisi euismod sed cursus arcu elementum ipsum arcu vivamus quis venenatis orci lorem ipsum et magna feugiat veroeros aliquam. Lorem ipsum dolor sit amet nullam dolore.</p>
-							</header>
-							<section class="tiles">
+ 						<header>
+ 							<h1>Vítejte na stránkách Heja Boys</h1>
+ 							<p>Undergroundová kapela s příběhy, hudbou a potemnělým vibem. Mrkněte na alba, merch a nejbližší akce.</p>
+ 						</header>
+
+ 						<section class="box" id="upcoming">
+ 							<h2>Nejbližší akce</h2>
+ 							<div id="upcoming-content">
+ 								<p>Načítám nejbližší akci z <a href="aktuality.html">Aktualit</a>…</p>
+ 							</div>
+ 						</section>
+
+ 						<section class="tiles">
 								<article class="style2">
 									<span class="image">
   								<img src="images/cutLogo/9.jpg" alt="" />
@@ -113,12 +121,23 @@
   									<p>Mini hry o naší kapele – brzy.</p>
   								</div>
   							</a>
-								</article>
-							</section>
-						</div>
-					</div>
-
-				<!-- Footer -->
+ 							</article>
+					<article class="style4">
+ 							<span class="image">
+ 					  			<img src="images/cutLogo/4.jpg" alt="" />
+ 					  		</span>
+ 					  		<a href="pichejte-nas.html">
+ 					  			<h2>Píchejte nás</h2>
+ 					  			<div class="content">
+ 					  				<p>Chceš koncert? Napiš nám, domluvíme se.</p>
+ 					  			</div>
+ 					  		</a>
+ 						</article>
+ 					</section>
+ 					</div>
+ 				</div>
+				
+ 				<!-- Footer -->
 					<footer id="footer">
 						<div class="inner">
 							<section>
@@ -163,6 +182,27 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-
-	</body>
-</html>
+			<script>
+				document.addEventListener('DOMContentLoaded', function () {
+					fetch('aktuality.html')
+						.then(r => r.text())
+						.then(html => {
+							const parser = new DOMParser();
+							const doc = parser.parseFromString(html, 'text/html');
+							const next = doc.querySelector('#next-event');
+							const cont = document.getElementById('upcoming-content');
+							if (next && cont) {
+								cont.innerHTML = '<p>' + next.innerHTML + '</p>';
+							} else if (cont) {
+								cont.innerHTML = '<p>Nepodařilo se najít nejbližší akci. Podívejte se na <a href="akce.html">Akce</a>.</p>';
+							}
+						})
+						.catch(() => {
+							const cont = document.getElementById('upcoming-content');
+							if (cont) cont.innerHTML = '<p>Nepodařilo se načíst aktuality. Zkuste <a href="akce.html">Akce</a>.</p>';
+						});
+				});
+			</script>
+		
+		</body>
+	</html>
