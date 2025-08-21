@@ -1831,9 +1831,9 @@ input, select, textarea {
 			font-weight: 900;
 		}
 
-		.icon.brands:before {
-			font-family: 'Font Awesome 5 Brands';
-		}
+        .icon.brands:before {
+                    font-family: 'Font Awesome 5 Brands';
+                }
 
 		.icon.style2 {
 			-moz-transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
