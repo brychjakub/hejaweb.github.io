@@ -22,7 +22,7 @@
 
   // --- Google Analytics (gtag) auto-loader ---
   function getGAIdFromMeta(){
-    var tag = document.querySelector('meta[name="G-0JJVYQRZZV"]');
+    var tag = document.querySelector('meta[name="ga-measurement-id"]');
     var id = tag && tag.getAttribute('content');
     return (id && id.trim()) || '';
   }
