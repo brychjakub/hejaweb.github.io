@@ -3330,7 +3330,7 @@ html { scroll-behavior: smooth; }
   background-size: min(80vmin, 700px);
   opacity: 0.06;
   pointer-events: none;
-  z-index: 0;
+  z-index: -1;
 }
 
 /* Subtle vibey shadows and hover */
