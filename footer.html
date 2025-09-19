@@ -2,22 +2,39 @@
 	<div class="inner">
 		<section>
 			<h2>Kontaktujte nás!</h2>
-			<form method="post" action="#">
-				<div class="fields">
-					<div class="field half">
-						<input type="text" name="name" id="name" placeholder="Name" />
-					</div>
-					<div class="field half">
-						<input type="email" name="email" id="email" placeholder="Email" />
-					</div>
-					<div class="field">
-						<textarea name="message" id="message" placeholder="Message"></textarea>
-					</div>
-				</div>
-				<ul class="actions">
-					<li><input type="submit" value="Send" class="primary" /></li>
-				</ul>
-			</form>
+
+            <form method="post" action="https://api.web3forms.com/submit" id="contact-form">
+                <!-- Web3Forms required fields -->
+                <!--							<input type="hidden" name="access_key" value="0d78da3e-e0f0-4967-bd9a-156ef03a9b3c">-->
+                <input type="hidden" style="display: none;" name="access_key"
+                       value="0d78da3e-e0f0-4967-bd9a-156ef03a9b3c">
+                <input type="hidden" name="subject" value="Nová zpráva z HejaWeb kontaktního formuláře">
+                <input type="hidden" name="from_name" value="HejaWeb Kontakt">
+
+                <!-- Honeypot field for bot detection (hidden from users) -->
+                <input type="text" name="honeypot" style="display: none;" tabindex="-1" autocomplete="off">
+
+                <!-- Rate limiting protection - redirect field removed to fix CORS issues -->
+
+                <div class="fields">
+                    <div class="field half">
+                        <label for="name">Jméno</label>
+                        <input type="text" name="name" id="name" required />
+                    </div>
+                    <div class="field half">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" id="email" required />
+                    </div>
+                    <div class="field">
+                        <label for="message">Zpráva</label>
+                        <textarea name="message" id="message" rows="4" required minlength="10"></textarea>
+                    </div>
+                </div>
+                <ul class="actions">
+                    <li><input type="submit" value="Odeslat zprávu" class="primary" id="submit-btn" /></li>
+                    <li><input type="reset" value="Vymazat" /></li>
+                </ul>
+            </form>
 		</section>
 		<section>
 			<h2>Follow</h2>
