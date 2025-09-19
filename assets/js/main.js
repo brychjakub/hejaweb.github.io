@@ -146,40 +146,53 @@
 
 				// Hide.
 					$menu._hide();
-
+					
 				// Redirect.
 					if (href == '#menu')
 						return;
-
+					
 					window.setTimeout(function() {
 						window.location.href = href;
 					}, 350);
-
-			})
-			.append('<a class="close" href="#menu">Close</a>');
-
-		$body
-			.on('click', 'a[href="#menu"]', function(event) {
-
-				event.stopPropagation();
-				event.preventDefault();
-
-				// Toggle.
-					$menu._toggle();
-
-			})
-			.on('click', function(event) {
-
-				// Hide.
-					$menu._hide();
-
-			})
-			.on('keydown', function(event) {
-
-				// Hide on escape.
-					if (event.keyCode == 27)
+					
+				})
+				.append('<a class="close" href="#menu">Close</a>');
+				
+			$body
+				.on('click', 'a[href="#menu"]', function(event) {
+					
+					event.stopPropagation();
+					event.preventDefault();
+					
+					// Toggle.
+						$menu._toggle();
+						
+					})
+				.on('click', function(event) {
+					
+					// Hide.
 						$menu._hide();
+						
+					})
+				.on('keydown', function(event) {
+					
+					// Hide on escape.
+						if (event.keyCode == 27)
+							$menu._hide();
+							
+					});
 
+		// Heja: Make .box.clickable navigate to its data-href (ignore inner links/buttons)
+		$('.box.clickable').each(function() {
+			var $box = $(this);
+			var url = $box.data('href');
+			if (!url) return;
+			$box.css('cursor', 'pointer');
+			$box.on('click', function(e) {
+				// If click is on an interactive element, do nothing
+				if ($(e.target).closest('a, button, input, textarea, select, label').length) return;
+				window.location.href = url;
 			});
-
+		});
+				
 })(jQuery);

@@ -2294,6 +2294,7 @@ input, select, textarea {
 		border: solid 1px #c9c9c9;
 		margin-bottom: 2em;
 		padding: 1.5em;
+		background-color: #ffffff;
 	}
 
 		.box > :last-child,
@@ -2348,9 +2349,9 @@ input, select, textarea {
 			width: 100%;
 		}
 
-			.image.fit img {
+ 		.image.fit img {
 				width: 100%;
-                height: 100%;
+                height: auto;
 			}
 
 		.image.main {
@@ -3318,6 +3319,9 @@ input, select, textarea {
 /* Custom overrides for Heja Boys vibe */
 html { scroll-behavior: smooth; }
 
+/* Make clickable boxes show pointer */
+.box.clickable { cursor: pointer; }
+
 /* Watermark background with logo */
 #wrapper { position: relative; }
 #wrapper::before {
@@ -3388,8 +3392,20 @@ body:not(.is-touch) .tiles article:hover > .image:before {
 
 /* Show article content (description) by default, not only on hover */
 .tiles article > a .content {
+  /* Hidden by default; revealed on hover */
+  max-height: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden;
+  padding: 0; /* avoid layout shift when hidden */
+  background: rgba(0,0,0,0.6);
+  border-radius: 6px;
+}
+
+/* Reveal description on hover with readable panel */
+body:not(.is-touch) .tiles article:hover .content {
   max-height: 15em !important;
   opacity: 1 !important;
+  padding: 0.75em 1em;
 }
 
 /* Make headings and text larger and bolder for better readability */
@@ -3403,5 +3419,95 @@ body:not(.is-touch) .tiles article:hover > .image:before {
 .tiles article > a .content p {
   font-size: 1.1em;
   font-weight: 700;
+  color: #ffffff;
   text-shadow: 0 1px 6px rgba(0,0,0,0.45);
+}
+
+
+/* Heja visibility & typography enhancements (links and text) */
+:root {
+  /* Stronger accent for links for better visibility */
+  --heja-accent: #f04f6a; /* accessible pink/red accent */
+  --heja-accent-hover: #c73d57;
+  --heja-accent-visited: #9e3347;
+}
+
+/* Make body text darker and a bit bolder for readability */
+body, p, li {
+  color: #222222;
+}
+
+p, li {
+  font-weight: 500;
+}
+
+/* Global link styling: clearly visible links */
+a {
+  color: var(--heja-accent);
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 2px;
+  font-weight: 700;
+}
+
+a:hover, a:focus {
+  color: var(--heja-accent-hover);
+  text-decoration-thickness: 3px;
+}
+
+a:visited {
+  color: var(--heja-accent-visited);
+}
+
+a:focus-visible {
+  outline: 2px dashed var(--heja-accent-hover);
+  outline-offset: 2px;
+}
+
+/* Do not underline UI elements that look like buttons/tiles/icons */
+.button,
+.actions a.button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"],
+#header nav a,
+#menu > .inner > ul > li > a,
+.tiles article > a,
+.icons a {
+  text-decoration: none !important;
+}
+
+
+/* HejaBoys Hero Title (homepage) */
+.heja-hero {
+  font-size: clamp(2.75rem, 6vw + 1rem, 7.5rem);
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  line-height: 0.92;
+  margin: 0.25em 0 0.4em;
+  position: relative;
+  color: transparent;
+  background: linear-gradient(120deg, #ffffff 0%, #f04f6a 35%, #ffce00 55%, #7bd0c1 75%, #ffffff 100%);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 1px rgba(0,0,0,0.08);
+  text-shadow: 0 0 12px rgba(240,79,106,0.30), 0 0 32px rgba(255,206,0,0.18);
+  animation: hejaGradient 8s ease infinite, hejaGlow 2.8s ease-in-out infinite;
+}
+
+@keyframes hejaGradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes hejaGlow {
+  0%, 100% { text-shadow: 0 0 8px rgba(240,79,106,0.25), 0 0 28px rgba(255,206,0,0.12); }
+  50% { text-shadow: 0 0 18px rgba(240,79,106,0.55), 0 0 48px rgba(255,206,0,0.25); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .heja-hero { animation: none; background-size: auto; }
 }
