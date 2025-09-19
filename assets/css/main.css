@@ -3410,6 +3410,7 @@ body:not(.is-touch) .tiles article:hover .content {
 
 /* Make headings and text larger and bolder for better readability */
 .tiles article > a h2 {
+  color: #ffffff !important; /* ensure white text on homepage tiles, overriding global #main h2 */
   font-size: 2em;
   font-weight: 900;
   letter-spacing: 0.01em;
@@ -3539,7 +3540,7 @@ input[type="button"],
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: white;
+    color: #222222;
     margin: 1.2em 0 0.6em 0;
     display: inline-block;
     position: relative;
