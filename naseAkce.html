@@ -1,8 +1,72 @@
-<section>
-  <h1>Akcee</h1>
-  <ul id="akce-list" class="alt"></ul>
-</section>
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Naše akce | Heja Boys</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="stylesheet" href="assets/css/main.css" />
+  <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
+  <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+</head>
 
+<body class="is-preload">
+<div id="wrapper">
+
+  <!-- HEADER (stejný jako jinde) -->
+  <header id="header">
+    <div class="inner">
+      <a href="index.html" class="logo">
+        <span class="symbol"><img src="images/logoFull.jpg" alt="" /></span>
+        <span class="title">Heja Boys</span>
+      </a>
+      <nav>
+        <ul>
+          <li><a href="#menu">Menu</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- MENU -->
+  <nav id="menu">
+    <h2>Menu</h2>
+    <ul>
+      <li><a href="index.html">Domů</a></li>
+      <li><a href="aktuality.html">Aktuality</a></li>
+      <li><a href="akce.html">Akce</a></li>
+      <li><a href="naseAkce.html">Naše akce</a></li>
+      <li><a href="alba.html">Alba</a></li>
+      <li><a href="merch.html">Merch</a></li>
+      <li><a href="hry.html">Hry</a></li>
+      <li><a href="onas.html">O nás</a></li>
+    </ul>
+  </nav>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div class="inner">
+
+      <h1>Naše akce</h1>
+      <p>Soukromé a interní akce.</p>
+
+      <section>
+        <h2>Přehled</h2>
+        <ul id="akce-list" class="alt"></ul>
+      </section>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- SCRIPTS (stejné jako jinde) -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/browser.min.js"></script>
+<script src="assets/js/breakpoints.min.js"></script>
+<script src="assets/js/util.js"></script>
+<script src="assets/js/main.js"></script>
+
+<!-- DATA SCRIPT -->
 <script>
 fetch('./akce.json')
   .then(r => r.json())
@@ -27,3 +91,6 @@ function formatDate(d) {
   return new Date(d).toLocaleDateString('cs-CZ');
 }
 </script>
+
+</body>
+</html>
