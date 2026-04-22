@@ -147,20 +147,16 @@ document.getElementById('akce-form').onsubmit = e => {
   });
 };
 
-function editAkce(id) {
-  fetch(API)
-    .then(r => r.json())
-    .then(data => {
-      const a = data.find(x => x.id === id);
-      if (!a) return;
+function editAkce(a) {
+  editingId = a.id;
 
-      editingId = id;
-      nazev.value = a.nazev;
-      datum.value = a.datum;
-      cas.value = a.cas;
-      misto.value = a.misto;
-      popis.value = a.popis;
-    });
+  document.getElementById('nazev').value = a.nazev;
+  document.getElementById('datum').value = a.datum;
+  document.getElementById('cas').value = a.cas || '';
+  document.getElementById('misto').value = a.misto || '';
+  document.getElementById('popis').value = a.popis || '';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function deleteAkce(id) {
