@@ -4,33 +4,64 @@
 <head>
   <title>Naše akce | Heja Boys</title>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <link rel="stylesheet" href="assets/css/main.css" />
-  <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
 
   <style>
-    /* 🔧 layout fix */
-    .inner {
-      max-width: 800px;
+    /* ===== layout fix (override template) ===== */
+    #wrapper > * > .inner {
+      max-width: 800px !important;
       margin: 0 auto;
     }
 
-    #akce-list li {
-      margin-bottom: 2em;
-      padding-bottom: 1em;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      text-align: left;
+    /* ===== cards ===== */
+    .akce-card {
+      background: rgba(255,255,255,0.03);
+      padding: 1.5em;
+      border-radius: 10px;
+      margin-bottom: 1.5em;
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
-    #akce-form {
-      text-align: left;
+    .akce-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5em;
+    }
+
+    .akce-title {
+      font-size: 1.3em;
+      font-weight: bold;
+    }
+
+    .akce-date {
+      font-size: 0.9em;
+      opacity: 0.7;
+    }
+
+    .akce-meta {
+      margin-bottom: 0.5em;
+      opacity: 0.8;
+    }
+
+    .akce-actions {
+      margin-top: 1em;
+    }
+
+    .section-title {
+      margin-top: 2em;
+      margin-bottom: 1em;
+      font-size: 1.2em;
+      opacity: 0.8;
     }
 
     #edit-info {
       margin-bottom: 1em;
       font-weight: bold;
+      color: #ffcc00;
     }
 
     button {
@@ -43,90 +74,57 @@
 <body class="is-preload">
 <div id="wrapper">
 
-  <!-- HEADER -->
+<header id="header">
+  <div class="inner">
+    <a href="index.html" class="logo">
+      <span class="symbol"><img src="images/logoFull.jpg" alt=""></span>
+      <span class="title">Heja Boys</span>
+    </a>
+  </div>
+</header>
 
-  <header id="header">
-    <div class="inner">
-      <a href="index.html" class="logo">
-        <span class="symbol"><img src="images/logoFull.jpg" alt=""></span>
-        <span class="title">Heja Boys</span>
-      </a>
-      <nav>
-        <ul>
-          <li><a href="#menu">Menu</a></li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+<div id="main">
+  <div class="inner">
 
-  <!-- MENU -->
+```
+<h1>Naše akce</h1>
 
-  <nav id="menu">
-    <h2>Menu</h2>
-    <ul>
-      <li><a href="index.html">Domů</a></li>
-      <li><a href="aktuality.html">Aktuality</a></li>
-      <li><a href="akce.html">Akce</a></li>
-      <li><a href="naseAkce.html">Naše akce</a></li>
-      <li><a href="alba.html">Alba</a></li>
-      <li><a href="merch.html">Merch</a></li>
-      <li><a href="onas.html">O nás</a></li>
-    </ul>
-  </nav>
+<!-- FORM -->
+<section>
+  <h2>Přidat / upravit akci</h2>
 
-  <!-- MAIN -->
+  <p id="edit-info" style="display:none;">
+    ✏️ Upravuji existující akci
+  </p>
 
-  <div id="main">
-    <div class="inner">
+  <form id="akce-form">
+    <input type="text" id="nazev" placeholder="Název" required>
+    <input type="date" id="datum" required>
+    <input type="time" id="cas">
+    <input type="text" id="misto" placeholder="Místo">
+    <textarea id="popis" placeholder="Popis"></textarea>
+    <button type="submit" id="submit-btn">Uložit akci</button>
+  </form>
+</section>
 
-  <h1>Naše akce</h1>
+<hr>
 
-  <!-- FORM -->
-  <section>
-    <h2>Přidat / upravit akci</h2>
+<!-- LIST -->
+<section>
+  <div class="section-title">📅 Nadcházející akce</div>
+  <div id="future-list"></div>
 
-    <p id="edit-info" style="display:none; color:#ffcc00;">
-      ✏️ Upravuji existující akci
-    </p>
-
-    <form id="akce-form">
-      <input type="hidden" id="akce-id">
-
-      <label>Název</label>
-      <input type="text" id="nazev" required>
-
-      <label>Datum</label>
-      <input type="date" id="datum" required>
-
-      <label>Čas</label>
-      <input type="time" id="cas">
-
-      <label>Místo</label>
-      <input type="text" id="misto">
-
-      <label>Popis</label>
-      <textarea id="popis"></textarea>
-
-      <button type="submit" id="submit-btn">Uložit akci</button>
-    </form>
-  </section>
-
-  <hr>
-
-  <!-- LIST -->
-  <section>
-    <h2>Seznam akcí</h2>
-    <ul id="akce-list" class="alt"></ul>
-  </section>
-
-</div>
+  <div class="section-title">📁 Proběhlé akce</div>
+  <div id="past-list"></div>
+</section>
 ```
 
   </div>
+</div>
 
 </div>
 
-<!-- SCRIPTS -->
+<!-- TEMPLATE SCRIPTS -->
 
 <script src="assets/js/jquery.min.js"></script>
 
@@ -137,6 +135,8 @@
 <script src="assets/js/util.js"></script>
 
 <script src="assets/js/main.js"></script>
+
+<!-- APP SCRIPT -->
 
 <script>
 const API = 'https://hejaboys.pythonanywhere.com/api/akce';
@@ -151,27 +151,67 @@ function loadAkce() {
   fetch(API)
     .then(r => r.json())
     .then(data => {
-      const list = document.getElementById('akce-list');
-      list.innerHTML = '';
+
+      const now = new Date();
+
+      const future = [];
+      const past = [];
 
       data.forEach(a => {
-        const li = document.createElement('li');
-
-        li.innerHTML = `
-          <strong>${a.nazev}</strong><br>
-          ${formatDate(a.datum)} ${a.cas ? 'v ' + a.cas : ''}<br>
-          ${a.misto ? '📍 ' + a.misto : ''}<br>
-          ${a.popis || ''}<br><br>
-          <button class="edit-btn">Upravit</button>
-          <button class="delete-btn">Smazat</button>
-        `;
-
-        li.querySelector('.edit-btn').addEventListener('click', () => editAkce(a));
-        li.querySelector('.delete-btn').addEventListener('click', () => deleteAkce(a.id));
-
-        list.appendChild(li);
+        const d = new Date(a.datum + ' ' + (a.cas || '00:00'));
+        if (d >= now) future.push(a);
+        else past.push(a);
       });
+
+      renderList('future-list', future);
+      renderList('past-list', past);
+    })
+    .catch(err => {
+      console.error('Chyba načítání:', err);
     });
+}
+
+// =====================
+// RENDER
+// =====================
+function renderList(id, data) {
+  const container = document.getElementById(id);
+  container.innerHTML = '';
+
+  if (data.length === 0) {
+    container.innerHTML = '<p>Žádné akce</p>';
+    return;
+  }
+
+  data.forEach(a => {
+    const div = document.createElement('div');
+    div.className = 'akce-card';
+
+    div.innerHTML = `
+      <div class="akce-header">
+        <div class="akce-title">${a.nazev}</div>
+        <div class="akce-date">
+          ${formatDate(a.datum)} ${a.cas ? 'v ' + a.cas : ''}
+        </div>
+      </div>
+
+      <div class="akce-meta">
+        ${a.misto ? '📍 ' + a.misto : ''}
+      </div>
+
+      <div>${a.popis || ''}</div>
+
+      <div class="akce-actions">
+        <button class="edit-btn">Upravit</button>
+        <button class="delete-btn">Smazat</button>
+      </div>
+    `;
+
+    div.querySelector('.edit-btn').addEventListener('click', () => editAkce(a));
+    div.querySelector('.delete-btn').addEventListener('click', () => deleteAkce(a.id));
+
+    container.appendChild(div);
+  });
 }
 
 // =====================
@@ -204,6 +244,9 @@ document.getElementById('akce-form').addEventListener('submit', e => {
     document.getElementById('submit-btn').textContent = 'Uložit akci';
 
     loadAkce();
+  })
+  .catch(err => {
+    console.error('Chyba ukládání:', err);
   });
 });
 
@@ -229,10 +272,13 @@ function editAkce(a) {
 // DELETE
 // =====================
 function deleteAkce(id) {
-  if (!confirm('Opravdu smazat tuto akci?')) return;
+  if (!confirm('Opravdu smazat?')) return;
 
   fetch(`${API}/${id}`, { method: 'DELETE' })
-    .then(() => loadAkce());
+    .then(() => loadAkce())
+    .catch(err => {
+      console.error('Chyba mazání:', err);
+    });
 }
 
 // =====================
