@@ -1,4 +1,5 @@
 <!DOCTYPE HTML>
+
 <html lang="cs">
 <head>
   <title>Naše akce | Heja Boys</title>
@@ -14,6 +15,7 @@
 <div id="wrapper">
 
   <!-- HEADER -->
+
   <header id="header">
     <div class="inner">
       <a href="index.html" class="logo">
@@ -29,6 +31,7 @@
   </header>
 
   <!-- MENU -->
+
   <nav id="menu">
     <h2>Menu</h2>
     <ul>
@@ -43,56 +46,69 @@
   </nav>
 
   <!-- MAIN -->
+
   <div id="main">
     <div class="inner">
 
-      <h1>Naše akce</h1>
-      <p>Veřejný seznam akcí – kdokoliv může přidávat a upravovat.</p>
+```
+  <h1>Naše akce</h1>
+  <p>Veřejný seznam akcí – kdokoliv může přidávat a upravovat.</p>
 
-      <!-- FORMULÁŘ -->
-      <section>
-        <h2>Přidat / upravit akci</h2>
+  <!-- FORMULÁŘ -->
+  <section>
+    <h2>Přidat / upravit akci</h2>
 
-        <form id="akce-form">
-          <input type="hidden" id="akce-id">
+    <p id="edit-info" style="display:none; color:#ffcc00;">
+      ✏️ Upravuji existující akci
+    </p>
 
-          <label>Název</label>
-          <input type="text" id="nazev" required>
+    <form id="akce-form">
+      <input type="hidden" id="akce-id">
 
-          <label>Datum</label>
-          <input type="date" id="datum" required>
+      <label>Název</label>
+      <input type="text" id="nazev" required>
 
-          <label>Čas</label>
-          <input type="time" id="cas">
+      <label>Datum</label>
+      <input type="date" id="datum" required>
 
-          <label>Místo</label>
-          <input type="text" id="misto">
+      <label>Čas</label>
+      <input type="time" id="cas">
 
-          <label>Popis</label>
-          <textarea id="popis"></textarea>
+      <label>Místo</label>
+      <input type="text" id="misto">
 
-          <button type="submit">Uložit akci</button>
-        </form>
-      </section>
+      <label>Popis</label>
+      <textarea id="popis"></textarea>
 
-      <hr>
+      <button type="submit" id="submit-btn">Uložit akci</button>
+    </form>
+  </section>
 
-      <!-- VÝPIS AKCÍ -->
-      <section>
-        <h2>Seznam akcí</h2>
-        <ul id="akce-list" class="alt"></ul>
-      </section>
+  <hr>
 
-    </div>
+  <!-- VÝPIS AKCÍ -->
+  <section>
+    <h2>Seznam akcí</h2>
+    <ul id="akce-list" class="alt"></ul>
+  </section>
+
+</div>
+```
+
   </div>
 
 </div>
 
 <!-- SCRIPTS -->
+
 <script src="assets/js/jquery.min.js"></script>
+
 <script src="assets/js/browser.min.js"></script>
+
 <script src="assets/js/breakpoints.min.js"></script>
+
 <script src="assets/js/util.js"></script>
+
 <script src="assets/js/main.js"></script>
 
 <script>
@@ -101,6 +117,9 @@ let editingId = null;
 
 loadAkce();
 
+// =====================
+// LOAD
+// =====================
 function loadAkce() {
   fetch(API)
     .then(r => r.json())
@@ -109,28 +128,36 @@ function loadAkce() {
       list.innerHTML = '';
 
       data.forEach(a => {
-        list.innerHTML += `
-          <li>
-            <strong>${a.nazev}</strong><br>
-            ${formatDate(a.datum)} — ${a.misto || ''} — ${a.cas || ''}<br>
-            ${a.popis || ''}<br><br>
-            <button onclick="editAkce(${a.id})">Upravit</button>
-            <button onclick="deleteAkce(${a.id})">Smazat</button>
-          </li>
+        const li = document.createElement('li');
+
+        li.innerHTML = `
+          <strong>${a.nazev}</strong><br>
+          ${formatDate(a.datum)} — ${a.misto || ''} — ${a.cas || ''}<br>
+          ${a.popis || ''}<br><br>
+          <button class="edit-btn">Upravit</button>
+          <button class="delete-btn">Smazat</button>
         `;
+
+        li.querySelector('.edit-btn').addEventListener('click', () => editAkce(a));
+        li.querySelector('.delete-btn').addEventListener('click', () => deleteAkce(a.id));
+
+        list.appendChild(li);
       });
     });
 }
 
-document.getElementById('akce-form').onsubmit = e => {
+// =====================
+// SUBMIT
+// =====================
+document.getElementById('akce-form').addEventListener('submit', e => {
   e.preventDefault();
 
   const data = {
-    nazev: nazev.value,
-    datum: datum.value,
-    cas: cas.value,
-    misto: misto.value,
-    popis: popis.value
+    nazev: document.getElementById('nazev').value,
+    datum: document.getElementById('datum').value,
+    cas: document.getElementById('cas').value,
+    misto: document.getElementById('misto').value,
+    popis: document.getElementById('popis').value
   };
 
   const method = editingId ? 'PUT' : 'POST';
@@ -140,13 +167,21 @@ document.getElementById('akce-form').onsubmit = e => {
     method: method,
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
-  }).then(() => {
+  })
+  .then(() => {
     e.target.reset();
     editingId = null;
+
+    document.getElementById('edit-info').style.display = 'none';
+    document.getElementById('submit-btn').textContent = 'Uložit akci';
+
     loadAkce();
   });
-};
+});
 
+// =====================
+// EDIT
+// =====================
 function editAkce(a) {
   editingId = a.id;
 
@@ -156,15 +191,25 @@ function editAkce(a) {
   document.getElementById('misto').value = a.misto || '';
   document.getElementById('popis').value = a.popis || '';
 
+  document.getElementById('edit-info').style.display = 'block';
+  document.getElementById('submit-btn').textContent = 'Uložit změny';
+
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// =====================
+// DELETE
+// =====================
 function deleteAkce(id) {
   if (!confirm('Opravdu smazat tuto akci?')) return;
+
   fetch(`${API}/${id}`, { method: 'DELETE' })
-    .then(loadAkce);
+    .then(() => loadAkce());
 }
 
+// =====================
+// FORMAT
+// =====================
 function formatDate(d) {
   return new Date(d).toLocaleDateString('cs-CZ');
 }
