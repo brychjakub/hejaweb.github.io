@@ -1,11 +1,19 @@
-
 [
   {
     "id": 1,
     "datum": "2026-05-14",
+    "cas": "18:00",
     "nazev": "Soukromá oslava",
     "misto": "Brno",
-    "cas": "18:00",
-    "popis": "Rodinná oslava narozenin"
+    "popis": "Rodinná akce"
+  },
+  {
+    "id": 2,
+    "datum": "2026-06-01",
+    "cas": "20:00",
+    "nazev": "Uzavřený koncert",
+    "misto": "Praha",
+    "popis": "Pouze pro zvané"
   }
 ]
+``
