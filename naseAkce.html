@@ -4,7 +4,7 @@
 </section>
 
 <script>
-fetch('akce.json')
+fetch('/akce.json')
   .then(r => r.json())
   .then(data => {
     const list = document.getElementById('akce-list');
