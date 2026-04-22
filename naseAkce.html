@@ -9,6 +9,35 @@
   <link rel="stylesheet" href="assets/css/main.css" />
   <noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+
+  <style>
+    /* 🔧 layout fix */
+    .inner {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    #akce-list li {
+      margin-bottom: 2em;
+      padding-bottom: 1em;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      text-align: left;
+    }
+
+    #akce-form {
+      text-align: left;
+    }
+
+    #edit-info {
+      margin-bottom: 1em;
+      font-weight: bold;
+    }
+
+    button {
+      margin-right: 0.5em;
+    }
+  </style>
+
 </head>
 
 <body class="is-preload">
@@ -54,7 +83,7 @@
   <h1>Naše akce</h1>
   <p>Veřejný seznam akcí – kdokoliv může přidávat a upravovat.</p>
 
-  <!-- FORMULÁŘ -->
+  <!-- FORM -->
   <section>
     <h2>Přidat / upravit akci</h2>
 
@@ -86,7 +115,7 @@
 
   <hr>
 
-  <!-- VÝPIS AKCÍ -->
+  <!-- LIST -->
   <section>
     <h2>Seznam akcí</h2>
     <ul id="akce-list" class="alt"></ul>
@@ -132,7 +161,8 @@ function loadAkce() {
 
         li.innerHTML = `
           <strong>${a.nazev}</strong><br>
-          ${formatDate(a.datum)} — ${a.misto || ''} — ${a.cas || ''}<br>
+          ${formatDate(a.datum)} ${a.cas ? 'v ' + a.cas : ''}<br>
+          ${a.misto ? '📍 ' + a.misto : ''}<br>
           ${a.popis || ''}<br><br>
           <button class="edit-btn">Upravit</button>
           <button class="delete-btn">Smazat</button>
