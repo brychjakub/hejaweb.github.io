@@ -1,0 +1,28 @@
+<section>
+  <h1>Akce</h1>
+  <ul id="akce-list" class="alt"></ul>
+</section>
+
+<script>
+fetch('akce.json')
+  .then(r => r.json())
+  .then(data => {
+    const list = document.getElementById('akce-list');
+
+    data
+      .sort((a,b) => new Date(a.datum) - new Date(b.datum))
+      .forEach(a => {
+        list.innerHTML += `
+          <li>
+            <strong>${a.nazev}</strong><br>
+            ${formatDate(a.datum)} — ${a.misto} — ${a.cas}<br>
+            ${a.popis}
+          </li>
+        `;
+      });
+  });
+
+function formatDate(d) {
+  return new Date(d).toLocaleDateString('cs-CZ');
+}
+</script>
