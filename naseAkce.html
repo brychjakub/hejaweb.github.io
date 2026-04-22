@@ -4,13 +4,13 @@
 </section>
 
 <script>
-fetch('/akce.json')
+fetch('./akce.json')
   .then(r => r.json())
   .then(data => {
     const list = document.getElementById('akce-list');
 
     data
-      .sort((a,b) => new Date(a.datum) - new Date(b.datum))
+      .sort((a, b) => new Date(a.datum) - new Date(b.datum))
       .forEach(a => {
         list.innerHTML += `
           <li>
@@ -20,7 +20,8 @@ fetch('/akce.json')
           </li>
         `;
       });
-  });
+  })
+  .catch(err => console.error(err));
 
 function formatDate(d) {
   return new Date(d).toLocaleDateString('cs-CZ');
