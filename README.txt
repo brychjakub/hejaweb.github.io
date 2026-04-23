@@ -16,3 +16,9 @@ Google Analytics:
 - Případně lze přidat do <head> meta tag: <meta name="ga-measurement-id" content="G-XXXXXXXXXX">. Meta má přednost.
 - Není potřeba upravovat jednotlivé stránky – skript se načítá automaticky přes assets/js/footer.js.
 
+
+
+úprava db na pythonanywhere:
+ v Bash console zadat sqlite3 /home/HejaBoys/hejaWeb/data.db
+- pak sql co chcu
+- na konci .exit
