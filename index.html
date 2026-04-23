@@ -40,14 +40,14 @@
 							<li><a href="akce.html">Akce</a></li>
 							<li><a href="alba.html">Alba</a></li>
 							<li><a href="merch.html">Merch</a></li>
- 						<li><a href="onas.html">O nás</a></li>
- 					</ul>
- 				</nav>
+ 							<li><a href="onas.html">O nás</a></li>
+ 						</ul>
+ 					</nav>
 
 				<!-- Main -->
 					<div id="main">
 						<div class="inner">
- 						<header>
+ 							<header>
                             <center>
                                 <h1 class="heja-hero">Heja Boys</h1>
                                 <p>alternative acoustic metal cringe pop depressive sci-fi synthwave fairytale folk
@@ -56,7 +56,7 @@
                             </center>
  						</header>
 
- 						<section class="box clickable" data-href="alba.html" id="upcoming">
+ 						<section class="box clickable" data-href="akce.html" id="upcoming">
  							<h2>Nejbližší akce</h2>
  							<div id="upcoming-content">
  								<p>Načítám nejbližší akci z <a href="aktuality.html">Aktualit</a>…</p>
@@ -64,63 +64,63 @@
  						</section>
 
  						<section class="tiles">
-								<article>
-									<span class="image">
-  								<img src="images/rustyNailPic2.jpg" alt="" />
-  							</span>
-  							<a href="akce.html">
-  								<h2>Akce</h2>
-  								<div class="content">
-  									<p>Přehled koncertů a akcí – současné i minulé.</p>
-  								</div>
-  							</a>
-								</article>
-								<article>
-									<span class="image">
-  								<img src="images/zehba.jpg" alt="" />
-  							</span>
-  							<a href="alba.html">
-  								<h2>Alba</h2>
-  								<div class="content">
-  									<p>Poslechněte si nás.</p>
-  								</div>
-  							</a>
-								</article>
-								<article>
-									<span class="image">
-  								<img src="images/trump_hejaboys.jpg" alt="" />
-  							</span>
-  							<a href="aktuality.html">
-  								<h2>Aktuality</h2>
-  								<div class="content">
-  									<p>Novinky o koncertech, akcích a vydáních.</p>
-  								</div>
-  							</a>
-								</article>
-								<article>
-									<span class="image">
-  								<img src="images/radek_noty.jpg" alt="" />
-  							</span>
-  							<a href="onas.html">
-  								<h2>O Nás</h2>
-  								<div class="content">
-  									<p>Současní i bývalí členové kapely.</p>
-  								</div>
-  							</a>
-								</article>
-								<article>
-									<span class="image">
-		  							<img src="images/podtacky.jpg" alt="" />
-		  						</span>
-		  						<a href="merch.html">
-		  							<h2>Merch</h2>
-		  							<div class="content">
-		  								<p>CD, trička, tašky, podtácky a víc.</p>
-		  							</div>
-		  						</a>
+							<article>
+								<span class="image">
+  									<img src="images/rustyNailPic2.jpg" alt="" />
+  								</span>
+  								<a href="akce.html">
+									<h2>Akce</h2>
+									<div class="content">
+										<p>Přehled koncertů a akcí – současné i minulé.</p>
+									</div>
+								</a>
 							</article>
-					
-					<article >
+							<article>
+								<span class="image">
+  									<img src="images/zehba.jpg" alt="" />
+  								</span>
+  								<a href="alba.html">
+									<h2>Alba</h2>
+									<div class="content">
+										<p>Poslechněte si nás.</p>
+									</div>
+								</a>
+							</article>
+							<article>
+								<span class="image">
+  									<img src="images/trump_hejaboys.jpg" alt="" />
+  								</span>
+  								<a href="aktuality.html">
+									<h2>Aktuality</h2>
+									<div class="content">
+										<p>Novinky o koncertech, akcích a vydáních.</p>
+									</div>
+								</a>
+							</article>
+							<article>
+								<span class="image">
+  									<img src="images/radek_noty.jpg" alt="" />
+  								</span>
+  								<a href="onas.html">
+									<h2>O Nás</h2>
+									<div class="content">
+										<p>Současní i bývalí členové kapely.</p>
+									</div>
+								</a>
+							</article>
+							<article>
+								<span class="image">
+					  				<img src="images/podtacky.jpg" alt="" />
+					  			</span>
+					  			<a href="merch.html">
+					  				<h2>Merch</h2>
+					  				<div class="content">
+					  					<p>CD, trička, tašky, podtácky a víc.</p>
+					  				</div>
+					  			</a>
+							</article>
+						
+						<article >
  							<span class="image">
  					  			<img src="images/pichejte_nas.jpg" alt="" />
  					  		</span>
@@ -130,10 +130,10 @@
  					  				<p>Chceš koncert? Napiš nám, domluvíme se.</p>
  					  			</div>
  					  		</a>
- 						</article>
- 					</section>
+							</article>
+ 						</section>
+ 						</div>
  					</div>
- 				</div>
 			</div>
 
 		<!-- Scripts -->
@@ -144,22 +144,50 @@
 			<script src="assets/js/main.js"></script>
 			<script>
 				document.addEventListener('DOMContentLoaded', function () {
-					fetch('aktuality.html')
-						.then(r => r.text())
-						.then(html => {
-							const parser = new DOMParser();
-							const doc = parser.parseFromString(html, 'text/html');
-							const next = doc.querySelector('#next-event');
-							const cont = document.getElementById('upcoming-content');
-							if (next && cont) {
-								cont.innerHTML = '<p>' + next.innerHTML + '</p>';
-							} else if (cont) {
-								cont.innerHTML = '<p>Nepodařilo se najít nejbližší akci. Podívejte se na <a href="akce.html">Akce</a>.</p>';
+					const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
+					const cont = document.getElementById('upcoming-content');
+
+					function isPublicEvent(a) {
+						return Number(a.public) === 1;
+					}
+
+					function toEventDate(a) {
+						return new Date(`${a.datum}T${a.cas || '00:00'}`);
+					}
+
+					function renderUpcoming(html) {
+						if (cont) cont.innerHTML = html;
+					}
+
+					fetch(API)
+						.then(r => r.json())
+						.then(data => {
+							const now = new Date();
+							const nextEvent = data
+								.filter(a => isPublicEvent(a) && toEventDate(a) >= now)
+								.sort((a, b) => toEventDate(a) - toEventDate(b))[0];
+
+							if (!nextEvent) {
+								renderUpcoming('<p>Brzy oznámíme další akci. Sledujte <a href="akce.html">Akce</a>.</p>');
+								return;
 							}
+
+							const eventDate = toEventDate(nextEvent);
+							const dateStr = eventDate.toLocaleDateString('cs-CZ');
+							const timeStr = nextEvent.cas ? ` v ${nextEvent.cas}` : '';
+							const locationStr = nextEvent.misto ? `, ${nextEvent.misto}` : '';
+							const description = nextEvent.popis ? '<br/>' + nextEvent.popis : '';
+
+							renderUpcoming(`
+								<p>
+									<strong>${nextEvent.nazev}</strong><br/>
+									${dateStr}${timeStr}${locationStr}${description}<br/>
+									<a href="akce.html">Všechny akce</a>
+								</p>
+							`);
 						})
 						.catch(() => {
-							const cont = document.getElementById('upcoming-content');
-							if (cont) cont.innerHTML = '<p>Nepodařilo se načíst aktuality. Zkuste <a href="akce.html">Akce</a>.</p>';
+							renderUpcoming('<p>Nepodařilo se načíst nejbližší akci. Zkuste <a href="akce.html">Akce</a>.</p>');
 						});
 				});
 			</script>
