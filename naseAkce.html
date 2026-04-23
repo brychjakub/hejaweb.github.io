@@ -231,9 +231,11 @@ function renderList(id, data) {
       <div>${a.popis || ''}</div>
 
       <div class="akce-actions">
-        <button class="publish-btn" data-id="${a.id}" data-public="${a.public}">
-          ${a.public ? '✓ Zveřejněná' : '🔒 Zveřejnit'}
-        </button>
+
+
+	<button class="publish-btn ${a.public ? 'published' : ''}" data-id="${a.id}" data-public="${a.public}">
+  ${a.public ? '✓ Zveřejněná' : '🔒 Zveřejnit'}
+</button>
         <button class="edit-btn">✏️ Upravit</button>
         <button class="delete-btn">🗑️ Smazat</button>
       </div>
