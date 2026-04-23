@@ -47,6 +47,20 @@
       opacity: 0.8;
     }
 
+    .akce-status {
+      margin-bottom: 0.75em;
+      font-size: 0.95em;
+      opacity: 0.95;
+    }
+
+    .akce-status.public {
+      color: #00ff64;
+    }
+
+    .akce-status.private {
+      color: #ffcc00;
+    }
+
     .akce-actions {
       margin-top: 1em;
       display: flex;
@@ -170,8 +184,26 @@
 <script>
 const API = 'https://hejaboys.pythonanywhere.com/api/akce';
 let editingId = null;
+let editingPublic = 0;
 
 loadAkce();
+
+function isPublicEvent(a) {
+  return Number(a.public) === 1;
+}
+
+function toEventDate(a) {
+  return new Date(`${a.datum}T${a.cas || '00:00'}`);
+}
+
+function resetFormState(form) {
+  form.reset();
+  editingId = null;
+  editingPublic = 0;
+
+  document.getElementById('edit-info').style.display = 'none';
+  document.getElementById('submit-btn').textContent = 'Uložit akci';
+}
 
 // =====================
 // LOAD
@@ -187,7 +219,7 @@ function loadAkce() {
       const past = [];
 
       data.forEach(a => {
-        const d = new Date(a.datum + ' ' + (a.cas || '00:00'));
+        const d = toEventDate(a);
         if (d >= now) future.push(a);
         else past.push(a);
       });
@@ -216,6 +248,8 @@ function renderList(id, data) {
     const div = document.createElement('div');
     div.className = 'akce-card';
 
+    const isPublic = isPublicEvent(a);
+
     div.innerHTML = `
       <div class="akce-header">
         <div class="akce-title">${a.nazev}</div>
@@ -228,20 +262,22 @@ function renderList(id, data) {
         ${a.misto ? '📍 ' + a.misto : ''}
       </div>
 
+      <div class="akce-status ${isPublic ? 'public' : 'private'}">
+        ${isPublic ? '🌍 Veřejná akce' : '🔒 Interní akce'}
+      </div>
+
       <div>${a.popis || ''}</div>
 
       <div class="akce-actions">
-
-
-	<button class="publish-btn ${a.public ? 'published' : ''}" data-id="${a.id}" data-public="${a.public}">
-  ${a.public ? '✓ Zveřejněná' : '🔒 Zveřejnit'}
+	<button class="publish-btn ${isPublic ? 'published' : ''}" data-id="${a.id}" data-public="${isPublic ? 1 : 0}">
+  ${isPublic ? '✓ Zveřejněná' : '🔒 Zveřejnit'}
 </button>
         <button class="edit-btn">✏️ Upravit</button>
         <button class="delete-btn">🗑️ Smazat</button>
       </div>
     `;
 
-    div.querySelector('.publish-btn').addEventListener('click', () => togglePublish(a.id, a.public));
+    div.querySelector('.publish-btn').addEventListener('click', () => togglePublish(a.id, isPublic));
     div.querySelector('.edit-btn').addEventListener('click', () => editAkce(a));
     div.querySelector('.delete-btn').addEventListener('click', () => deleteAkce(a.id));
 
@@ -259,6 +295,10 @@ function togglePublish(id, currentPublic) {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ public: newPublic })
+  })
+  .then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
   })
   .then(() => {
     loadAkce();
@@ -280,7 +320,7 @@ document.getElementById('akce-form').addEventListener('submit', e => {
     cas: document.getElementById('cas').value,
     misto: document.getElementById('misto').value,
     popis: document.getElementById('popis').value,
-    public: 0
+    public: editingId ? editingPublic : 0
   };
 
   const method = editingId ? 'PUT' : 'POST';
@@ -291,13 +331,12 @@ document.getElementById('akce-form').addEventListener('submit', e => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data)
   })
+  .then(r => {
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  })
   .then(() => {
-    e.target.reset();
-    editingId = null;
-
-    document.getElementById('edit-info').style.display = 'none';
-    document.getElementById('submit-btn').textContent = 'Uložit akci';
-
+    resetFormState(e.target);
     loadAkce();
   })
   .catch(err => {
@@ -310,6 +349,7 @@ document.getElementById('akce-form').addEventListener('submit', e => {
 // =====================
 function editAkce(a) {
   editingId = a.id;
+  editingPublic = isPublicEvent(a) ? 1 : 0;
 
   document.getElementById('nazev').value = a.nazev;
   document.getElementById('datum').value = a.datum;
@@ -330,7 +370,16 @@ function deleteAkce(id) {
   if (!confirm('Opravdu smazat?')) return;
 
   fetch(`${API}/${id}`, { method: 'DELETE' })
-    .then(() => loadAkce())
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(() => {
+      if (editingId === id) {
+        resetFormState(document.getElementById('akce-form'));
+      }
+      loadAkce();
+    })
     .catch(err => {
       console.error('Chyba mazání:', err);
     });
@@ -340,7 +389,7 @@ function deleteAkce(id) {
 // FORMAT
 // =====================
 function formatDate(d) {
-  return new Date(d).toLocaleDateString('cs-CZ');
+  return new Date(`${d}T00:00`).toLocaleDateString('cs-CZ');
 }
 </script>
 
