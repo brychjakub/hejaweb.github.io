@@ -7,6 +7,33 @@
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 		<link rel="icon" type="image/x-icon" href="images/favicon.ico">
+		<style>
+			.akce-list {
+				list-style: none;
+				padding: 0;
+			}
+			.akce-item {
+				background: rgba(255,255,255,0.03);
+				padding: 1.5em;
+				border-radius: 10px;
+				margin-bottom: 1em;
+				border: 1px solid rgba(255,255,255,0.08);
+			}
+			.akce-item strong {
+				display: block;
+				margin-bottom: 0.5em;
+				font-size: 1.1em;
+			}
+			.akce-meta {
+				opacity: 0.8;
+				font-size: 0.9em;
+				margin: 0.25em 0;
+			}
+			.akce-popis {
+				margin-top: 0.75em;
+				opacity: 0.9;
+			}
+		</style>
 	</head>
 	<body class="is-preload">
 		<div id="wrapper">
@@ -41,20 +68,19 @@
 			<div id="main">
 				<div class="inner">
 					<h1>Akce</h1>
-					<p>Rozdělené na současné a minulé akce. Přidejte konkrétní termíny a místa podle potřeby.</p>
+					<p>Všechny zveřejněné akce jsou zde.</p>
 
 					<section>
 						<h2>Současné akce</h2>
-						<ul>
-							<li><strong>Brzy oznámíme</strong> – sledujte <a href="aktuality.html">Aktuality</a>.</li>
+						<ul id="current-akce" class="akce-list">
+							<li><p>Načítám...</p></li>
 						</ul>
 					</section>
 
 					<section>
 						<h2>Minulé akce</h2>
-						<ul class="alt">
-							<li>2024 – Podzemní klub XYZ, Praha</li>
-							<li>2023 – Festival Undergroundu, Brno</li>
+						<ul id="past-akce" class="akce-list alt">
+							<li><p>Načítám...</p></li>
 						</ul>
 					</section>
 				</div>
@@ -67,5 +93,52 @@
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
 		<script src="assets/js/footer.js"></script>
+
+		<script>
+			const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
+
+			loadAkce();
+
+			function loadAkce() {
+				fetch(API)
+					.then(r => r.json())
+					.then(data => {
+						const now = new Date();
+						const current = [];
+						const past = [];
+
+						data.forEach(a => {
+							const d = new Date(a.datum + ' ' + (a.cas || '00:00'));
+							if (d >= now) current.push(a);
+							else past.push(a);
+						});
+
+						renderAkce('current-akce', current);
+						renderAkce('past-akce', past);
+					})
+					.catch(err => console.error('Chyba:', err));
+			}
+
+			function renderAkce(id, data) {
+				const container = document.getElementById(id);
+				if (data.length === 0) {
+					container.innerHTML = '<li><p>Žádné akce</p></li>';
+					return;
+				}
+
+				container.innerHTML = data.map(a => `
+					<li class="akce-item">
+						<strong>${a.nazev}</strong>
+						<div class="akce-meta">📅 ${formatDate(a.datum)}${a.cas ? ' v ' + a.cas : ''}</div>
+						${a.misto ? '<div class="akce-meta">📍 ' + a.misto + '</div>' : ''}
+						${a.popis ? '<div class="akce-popis">' + a.popis + '</div>' : ''}
+					</li>
+				`).join('');
+			}
+
+			function formatDate(d) {
+				return new Date(d).toLocaleDateString('cs-CZ');
+			}
+		</script>
 	</body>
 </html>
