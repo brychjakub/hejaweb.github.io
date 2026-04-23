@@ -67,14 +67,22 @@
 
 			loadNextEvent();
 
+			function isPublicEvent(a) {
+				return Number(a.public) === 1;
+			}
+
+			function toEventDate(a) {
+				return new Date(`${a.datum}T${a.cas || '00:00'}`);
+			}
+
 			function loadNextEvent() {
 				fetch(API)
 					.then(r => r.json())
 					.then(data => {
 						const now = new Date();
 						const upcomingEvents = data
-							.filter(a => new Date(a.datum) >= now)
-							.sort((a, b) => new Date(a.datum) - new Date(b.datum));
+							.filter(a => isPublicEvent(a) && toEventDate(a) >= now)
+							.sort((a, b) => toEventDate(a) - toEventDate(b));
 
 						if (upcomingEvents.length === 0) {
 							document.getElementById('next-event').innerHTML = `
@@ -85,7 +93,7 @@
 						}
 
 						const event = upcomingEvents[0];
-						const eventDate = new Date(event.datum);
+						const eventDate = toEventDate(event);
 						const dateStr = eventDate.toLocaleDateString('cs-CZ');
 						const timeStr = event.cas ? ` — start ${event.cas}` : '';
 						const location = event.misto ? ` — ${event.misto}` : '';
