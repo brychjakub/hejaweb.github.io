@@ -193,7 +193,7 @@ function isPublicEvent(a) {
 }
 
 function toEventDate(a) {
-  return new Date(`${a.datum}T${a.cas || '00:00'}`);
+  return new Date(`${a.datum}T${a.cas || '23:59'}`);
 }
 
 function resetFormState(form) {
