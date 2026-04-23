@@ -45,13 +45,11 @@
 
 					<section>
 						<h2>Nejnovější</h2>
-						<ul class="alt">
+						<ul class="alt" id="next-event-container">
 							<li id="next-event">
-								<strong>Nejbližší akce</strong><br/>
-								28. 9. 2025 — Klub Kotelna, Brno — start 20:00. Vstupné dobrovolné. <a href="akce.html">Více v Akcích</a>.
+								<strong>Načítám...</strong>
 							</li>
 						</ul>
-<!--						 Nejbližší akci upravíte změnou položky s id="next-event". Ostatní novinky přidávejte pod to.-->
 					</section>
 				</div>
 			</div>
@@ -63,5 +61,49 @@
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
 		<script src="assets/js/footer.js"></script>
+
+		<script>
+			const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
+
+			loadNextEvent();
+
+			function loadNextEvent() {
+				fetch(API)
+					.then(r => r.json())
+					.then(data => {
+						const now = new Date();
+						const upcomingEvents = data
+							.filter(a => new Date(a.datum) >= now)
+							.sort((a, b) => new Date(a.datum) - new Date(b.datum));
+
+						if (upcomingEvents.length === 0) {
+							document.getElementById('next-event').innerHTML = `
+								<strong>Brzy oznámíme</strong><br/>
+								Sledujte tuto stránku pro nové akce.
+							`;
+							return;
+						}
+
+						const event = upcomingEvents[0];
+						const eventDate = new Date(event.datum);
+						const dateStr = eventDate.toLocaleDateString('cs-CZ');
+						const timeStr = event.cas ? ` — start ${event.cas}` : '';
+						const location = event.misto ? ` — ${event.misto}` : '';
+
+						document.getElementById('next-event').innerHTML = `
+							<strong>${event.nazev}</strong><br/>
+							${dateStr}${timeStr}${location}${event.popis ? '<br/>' + event.popis : ''}<br/>
+							<a href="akce.html">Více v Akcích</a>.
+						`;
+					})
+					.catch(err => {
+						console.error('Chyba:', err);
+						document.getElementById('next-event').innerHTML = `
+							<strong>Chyba načítání</strong><br/>
+							Zkuste později.
+						`;
+					});
+			}
+		</script>
 	</body>
 </html>
