@@ -99,6 +99,14 @@
 
 			loadAkce();
 
+			function isPublicEvent(a) {
+				return Number(a.public) === 1;
+			}
+
+			function toEventDate(a) {
+				return new Date(`${a.datum}T${a.cas || '00:00'}`);
+			}
+
 			function loadAkce() {
 				fetch(API)
 					.then(r => r.json())
@@ -107,16 +115,21 @@
 						const current = [];
 						const past = [];
 
-						data.forEach(a => {
-							const d = new Date(a.datum + ' ' + (a.cas || '00:00'));
-							if (d >= now) current.push(a);
-							else past.push(a);
-						});
+						data
+							.filter(isPublicEvent)
+							.forEach(a => {
+								const d = toEventDate(a);
+								if (d >= now) current.push(a);
+								else past.push(a);
+							});
 
 						renderAkce('current-akce', current);
 						renderAkce('past-akce', past);
 					})
-					.catch(err => console.error('Chyba:', err));
+					.catch(() => {
+						document.getElementById('current-akce').innerHTML = '<li><p>Chyba načítání</p></li>';
+						document.getElementById('past-akce').innerHTML = '<li><p>Zkuste to prosím později.</p></li>';
+					});
 			}
 
 			function renderAkce(id, data) {
@@ -137,7 +150,7 @@
 			}
 
 			function formatDate(d) {
-				return new Date(d).toLocaleDateString('cs-CZ');
+				return new Date(`${d}T00:00`).toLocaleDateString('cs-CZ');
 			}
 		</script>
 	</body>
