@@ -143,13 +143,19 @@
 						<strong>${a.nazev}</strong>
 						<div class="akce-meta">📅 ${formatDate(a.datum)}${a.cas ? ' v ' + a.cas : ''}</div>
 						${a.misto ? '<div class="akce-meta">📍 ' + a.misto + '</div>' : ''}
-						${a.popis ? '<div class="akce-popis">' + a.popis + '</div>' : ''}
+						${a.popis ? '<div class="akce-popis">' + parseLinks(a.popis) + '</div>' : ''}
 					</li>
 				`).join('');
 			}
 
 			function formatDate(d) {
 				return new Date(`${d}T00:00`).toLocaleDateString('cs-CZ');
+			}
+
+			function parseLinks(text) {
+				if (!text) return '';
+				const urlRegex = /(https?:\/\/[^\s]+)/g;
+				return text.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
 			}
 		</script>
 	</body>
