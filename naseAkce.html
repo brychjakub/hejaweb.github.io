@@ -400,8 +400,7 @@ function parseLinks(text) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   
   return text.replace(urlRegex, (url) => {
-    const safeLabel = url.length > 48 ? `${url.slice(0, 45)}…` : url;
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #00ff64; text-decoration: underline; word-break: break-word; overflow-wrap: anywhere;">${safeLabel}</a>`;
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #00ff64; text-decoration: underline;">${url}</a>`;
   });
 }
 </script>

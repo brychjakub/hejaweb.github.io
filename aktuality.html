@@ -77,10 +77,7 @@
 			function parseLinks(text) {
 				if (!text) return '';
 				const urlRegex = /(https?:\/\/[^\s]+)/g;
-				return text.replace(urlRegex, url => {
-					const safeLabel = url.length > 48 ? `${url.slice(0, 45)}…` : url;
-					return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="word-break: break-word; overflow-wrap: anywhere;">${safeLabel}</a>`;
-				});
+				return text.replace(urlRegex, url => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`);
 			}
 
 			function loadNextEvent() {
