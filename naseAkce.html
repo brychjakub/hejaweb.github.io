@@ -400,7 +400,12 @@ function parseLinks(text) {
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   
   return text.replace(urlRegex, (url) => {
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #00ff64; text-decoration: underline;">${url}</a>`;
+    let safeLabel = 'Odkaz';
+    try {
+      const parsed = new URL(url);
+      safeLabel = parsed.hostname.replace(/^www\./, '') + (parsed.pathname && parsed.pathname !== '/' ? '/…' : '');
+    } catch (_) {}
+    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #00ff64; text-decoration: underline;">${safeLabel}</a>`;
   });
 }
 </script>
