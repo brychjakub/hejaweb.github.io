@@ -74,6 +74,19 @@
 				return new Date(`${a.datum}T${a.cas || '23:59'}`);
 			}
 
+			function parseLinks(text) {
+				if (!text) return '';
+				const urlRegex = /(https?:\/\/[^\s]+)/g;
+				return text.replace(urlRegex, url => {
+					let safeLabel = 'Odkaz';
+					try {
+						const parsed = new URL(url);
+						safeLabel = parsed.hostname.replace(/^www\./, '') + (parsed.pathname && parsed.pathname !== '/' ? '/…' : '');
+					} catch (_) {}
+					return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeLabel}</a>`;
+				});
+			}
+
 			function loadNextEvent() {
 				fetch(API)
 					.then(r => r.json())
@@ -99,7 +112,7 @@
 
 						document.getElementById('next-event').innerHTML = `
 							<strong>${event.nazev}</strong><br/>
-							${dateStr}${timeStr}${location}${event.popis ? '<br/>' + event.popis : ''}<br/>
+							${dateStr}${timeStr}${location}${event.popis ? '<br/>' + parseLinks(event.popis) : ''}<br/>
 							<a href="akce.html">Více v Akcích</a>.
 						`;
 					})
