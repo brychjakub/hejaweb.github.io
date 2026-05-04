@@ -155,6 +155,15 @@
 						return new Date(`${a.datum}T${a.cas || '23:59'}`);
 					}
 
+					function parseLinks(text) {
+						if (!text) return '';
+						const urlRegex = /(https?:\/\/[^\s]+)/g;
+						return text.replace(urlRegex, url => {
+						const safeLabel = url.length > 48 ? `${url.slice(0, 45)}…` : url;
+						return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="word-break: break-word; overflow-wrap: anywhere;">${safeLabel}</a>`;
+					});
+					}
+
 					function renderUpcoming(html) {
 						if (cont) cont.innerHTML = html;
 					}
@@ -176,7 +185,7 @@
 							const dateStr = eventDate.toLocaleDateString('cs-CZ');
 							const timeStr = nextEvent.cas ? ` v ${nextEvent.cas}` : '';
 							const locationStr = nextEvent.misto ? `, ${nextEvent.misto}` : '';
-							const description = nextEvent.popis ? '<br/>' + nextEvent.popis : '';
+							const description = nextEvent.popis ? '<br/>' + parseLinks(nextEvent.popis) : '';
 
 							renderUpcoming(`
 								<p>
