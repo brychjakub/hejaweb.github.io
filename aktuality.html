@@ -60,36 +60,12 @@
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
 		<script src="assets/js/footer.js"></script>
+		<script src="assets/js/events-common.js"></script>
 
 		<script>
 			const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
 
 			loadNextEvent();
-
-			function isPublicEvent(a) {
-				return Number(a.public) === 1;
-			}
-
-			function toEventDate(a) {
-				return new Date(`${a.datum}T${a.cas || '23:59'}`);
-			}
-
-			function toEventDayEnd(a) {
-				return new Date(`${a.datum}T23:59:59`);
-			}
-
-			function parseLinks(text) {
-				if (!text) return '';
-				const urlRegex = /(https?:\/\/[^\s]+)/g;
-				return text.replace(urlRegex, url => {
-					let safeLabel = 'Odkaz';
-					try {
-						const parsed = new URL(url);
-						safeLabel = parsed.hostname.replace(/^www\./, '') + (parsed.pathname && parsed.pathname !== '/' ? '/…' : '');
-					} catch (_) {}
-					return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeLabel}</a>`;
-				});
-			}
 
 			function loadNextEvent() {
 				fetch(API)
@@ -97,8 +73,8 @@
 					.then(data => {
 						const now = new Date();
 						const upcomingEvents = data
-							.filter(a => isPublicEvent(a) && toEventDayEnd(a) >= now)
-							.sort((a, b) => toEventDate(a) - toEventDate(b));
+							.filter(a => HejaEvents.isPublicEvent(a) && HejaEvents.toEventDayEnd(a) >= now)
+							.sort((a, b) => HejaEvents.toEventDate(a) - HejaEvents.toEventDate(b));
 
 						if (upcomingEvents.length === 0) {
 							document.getElementById('next-event').innerHTML = `
@@ -109,14 +85,14 @@
 						}
 
 						const event = upcomingEvents[0];
-						const eventDate = toEventDate(event);
+						const eventDate = HejaEvents.toEventDate(event);
 						const dateStr = eventDate.toLocaleDateString('cs-CZ');
 						const timeStr = event.cas ? ` — start ${event.cas}` : '';
 						const location = event.misto ? ` — ${event.misto}` : '';
 
 						document.getElementById('next-event').innerHTML = `
 							<strong>${event.nazev}</strong><br/>
-							${dateStr}${timeStr}${location}${event.popis ? '<br/>' + parseLinks(event.popis) : ''}<br/>
+							${dateStr}${timeStr}${location}${event.popis ? '<br/>' + HejaEvents.parseLinks(event.popis) : ''}<br/>
 							<a href="akce.html">Více v Akcích</a>.
 						`;
 					})

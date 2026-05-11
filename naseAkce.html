@@ -8,109 +8,8 @@
 
   <link rel="stylesheet" href="assets/css/main.css" />
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
+  <link rel="stylesheet" href="assets/css/nase-akce.css" />
 
-  <style>
-    /* ===== layout fix (override template) ===== */
-    #wrapper > * > .inner {
-      max-width: 800px !important;
-      margin: 0 auto;
-    }
-
-    /* ===== cards ===== */
-    .akce-card {
-      background: rgba(255,255,255,0.03);
-      padding: 1.5em;
-      border-radius: 10px;
-      margin-bottom: 1.5em;
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .akce-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.5em;
-    }
-
-    .akce-title {
-      font-size: 1.3em;
-      font-weight: bold;
-    }
-
-    .akce-date {
-      font-size: 0.9em;
-      opacity: 0.7;
-    }
-
-    .akce-meta {
-      margin-bottom: 0.5em;
-      opacity: 0.8;
-    }
-
-    .akce-status {
-      margin-bottom: 0.75em;
-      font-size: 0.95em;
-      opacity: 0.95;
-    }
-
-    .akce-status.public {
-      color: #00ff64;
-    }
-
-    .akce-status.private {
-      color: #ffcc00;
-    }
-
-    .akce-actions {
-      margin-top: 1em;
-      display: flex;
-      gap: 0.5em;
-      flex-wrap: wrap;
-    }
-
-    .section-title {
-      margin-top: 2em;
-      margin-bottom: 1em;
-      font-size: 1.2em;
-      opacity: 0.8;
-    }
-
-    #edit-info {
-      margin-bottom: 1em;
-      font-weight: bold;
-      color: #ffcc00;
-    }
-
-    button {
-      padding: 0.5em 1em;
-      border: 1px solid rgba(255,255,255,0.2);
-      background: rgba(255,255,255,0.05);
-      color: #fff;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    button:hover {
-      background: rgba(255,255,255,0.1);
-      border-color: rgba(255,255,255,0.4);
-    }
-
-    .publish-btn {
-      background: rgba(0, 200, 100, 0.2);
-      border-color: rgba(0, 200, 100, 0.5);
-    }
-
-    .publish-btn:hover {
-      background: rgba(0, 200, 100, 0.3);
-    }
-
-    .publish-btn.published {
-      background: rgba(0, 255, 100, 0.3);
-      border-color: rgba(0, 255, 100, 0.7);
-      color: #00ff64;
-    }
-  </style>
 
 </head>
 
@@ -179,6 +78,7 @@
 
 <script src="assets/js/main.js"></script>
 <script src="assets/js/footer.js"></script>
+<script src="assets/js/events-common.js"></script>
 
 <!-- APP SCRIPT -->
 
@@ -188,18 +88,6 @@ let editingId = null;
 let editingPublic = 0;
 
 loadAkce();
-
-function isPublicEvent(a) {
-  return Number(a.public) === 1;
-}
-
-function toEventDate(a) {
-  return new Date(`${a.datum}T${a.cas || '23:59'}`);
-}
-
-function toEventDayEnd(a) {
-  return new Date(`${a.datum}T23:59:59`);
-}
 
 function resetFormState(form) {
   form.reset();
@@ -224,7 +112,7 @@ function loadAkce() {
       const past = [];
 
       data.forEach(a => {
-        const d = toEventDayEnd(a);
+        const d = HejaEvents.toEventDayEnd(a);
         if (d >= now) future.push(a);
         else past.push(a);
       });
@@ -253,13 +141,13 @@ function renderList(id, data) {
     const div = document.createElement('div');
     div.className = 'akce-card';
 
-    const isPublic = isPublicEvent(a);
+    const isPublic = HejaEvents.isPublicEvent(a);
 
     div.innerHTML = `
       <div class="akce-header">
         <div class="akce-title">${a.nazev}</div>
         <div class="akce-date">
-          ${formatDate(a.datum)} ${a.cas ? 'v ' + a.cas : ''}
+          ${HejaEvents.formatDate(a.datum)} ${a.cas ? 'v ' + a.cas : ''}
         </div>
       </div>
 
@@ -271,7 +159,7 @@ function renderList(id, data) {
         ${isPublic ? '🌍 Veřejná akce' : '🔒 Interní akce'}
       </div>
 
-      <div>${parseLinks(a.popis || '')}</div>
+      <div>${HejaEvents.parseLinks(a.popis || '', { linkStyle: 'color: #00ff64; text-decoration: underline;' })}</div>
 
       <div class="akce-actions">
 	<button class="publish-btn ${isPublic ? 'published' : ''}" data-id="${a.id}" data-public="${isPublic ? 1 : 0}">
@@ -354,7 +242,7 @@ document.getElementById('akce-form').addEventListener('submit', e => {
 // =====================
 function editAkce(a) {
   editingId = a.id;
-  editingPublic = isPublicEvent(a) ? 1 : 0;
+  editingPublic = HejaEvents.isPublicEvent(a) ? 1 : 0;
 
   document.getElementById('nazev').value = a.nazev;
   document.getElementById('datum').value = a.datum;
@@ -390,28 +278,6 @@ function deleteAkce(id) {
     });
 }
 
-// =====================
-// FORMAT
-// =====================
-function formatDate(d) {
-  return new Date(`${d}T00:00`).toLocaleDateString('cs-CZ');
-}
-
-function parseLinks(text) {
-  if (!text) return '';
-  
-  // Regex na detekci URL
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  
-  return text.replace(urlRegex, (url) => {
-    let safeLabel = 'Odkaz';
-    try {
-      const parsed = new URL(url);
-      safeLabel = parsed.hostname.replace(/^www\./, '') + (parsed.pathname && parsed.pathname !== '/' ? '/…' : '');
-    } catch (_) {}
-    return `<a href="${url}" target="_blank" rel="noopener noreferrer" style="color: #00ff64; text-decoration: underline;">${safeLabel}</a>`;
-  });
-}
 </script>
 
 </body>

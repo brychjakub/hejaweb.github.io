@@ -142,35 +142,11 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
+			<script src="assets/js/events-common.js"></script>
 			<script>
 				document.addEventListener('DOMContentLoaded', function () {
 					const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
 					const cont = document.getElementById('upcoming-content');
-
-					function isPublicEvent(a) {
-						return Number(a.public) === 1;
-					}
-
-					function toEventDate(a) {
-						return new Date(`${a.datum}T${a.cas || '23:59'}`);
-					}
-
-					function toEventDayEnd(a) {
-						return new Date(`${a.datum}T23:59:59`);
-					}
-
-					function parseLinks(text) {
-						if (!text) return '';
-						const urlRegex = /(https?:\/\/[^\s]+)/g;
-						return text.replace(urlRegex, url => {
-							let safeLabel = 'Odkaz';
-							try {
-								const parsed = new URL(url);
-								safeLabel = parsed.hostname.replace(/^www\./, '') + (parsed.pathname && parsed.pathname !== '/' ? '/…' : '');
-							} catch (_) {}
-							return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeLabel}</a>`;
-						});
-					}
 
 					function renderUpcoming(html) {
 						if (cont) cont.innerHTML = html;
@@ -181,19 +157,19 @@
 						.then(data => {
 							const now = new Date();
 							const nextEvent = data
-								.filter(a => isPublicEvent(a) && toEventDayEnd(a) >= now)
-								.sort((a, b) => toEventDate(a) - toEventDate(b))[0];
+								.filter(a => HejaEvents.isPublicEvent(a) && HejaEvents.toEventDayEnd(a) >= now)
+								.sort((a, b) => HejaEvents.toEventDate(a) - HejaEvents.toEventDate(b))[0];
 
 							if (!nextEvent) {
 								renderUpcoming('<p>Brzy oznámíme další akci. Sledujte <a href="akce.html">Akce</a>.</p>');
 								return;
 							}
 
-							const eventDate = toEventDate(nextEvent);
+							const eventDate = HejaEvents.toEventDate(nextEvent);
 							const dateStr = eventDate.toLocaleDateString('cs-CZ');
 							const timeStr = nextEvent.cas ? ` v ${nextEvent.cas}` : '';
 							const locationStr = nextEvent.misto ? `, ${nextEvent.misto}` : '';
-							const description = nextEvent.popis ? '<br/>' + parseLinks(nextEvent.popis) : '';
+							const description = nextEvent.popis ? '<br/>' + HejaEvents.parseLinks(nextEvent.popis) : '';
 
 							renderUpcoming(`
 								<p>
