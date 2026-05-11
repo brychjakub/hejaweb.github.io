@@ -70,7 +70,7 @@
 					<p>Všechny zveřejněné akce jsou zde.</p>
 
 					<section>
-						<h2>Současné akce</h2>
+						<h2>Aktuální akce</h2>
 						<ul id="current-akce" class="akce-list">
 							<li><p>Načítám...</p></li>
 						</ul>
@@ -92,19 +92,12 @@
 		<script src="assets/js/util.js"></script>
 		<script src="assets/js/main.js"></script>
 		<script src="assets/js/footer.js"></script>
+		<script src="assets/js/events-common.js"></script>
 
 		<script>
 			const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
 
 			loadAkce();
-
-			function isPublicEvent(a) {
-				return Number(a.public) === 1;
-			}
-
-			function toEventDate(a) {
-				return new Date(`${a.datum}T${a.cas || '23:59'}`);
-			}
 
 			function loadAkce() {
 				fetch(API)
@@ -115,9 +108,9 @@
 						const past = [];
 
 						data
-							.filter(isPublicEvent)
+							.filter(HejaEvents.isPublicEvent)
 							.forEach(a => {
-								const d = toEventDate(a);
+								const d = HejaEvents.toEventDayEnd(a);
 								if (d >= now) current.push(a);
 								else past.push(a);
 							});
@@ -141,15 +134,11 @@
 				container.innerHTML = data.map(a => `
 					<li class="akce-item">
 						<strong>${a.nazev}</strong>
-						<div class="akce-meta">📅 ${formatDate(a.datum)}${a.cas ? ' v ' + a.cas : ''}</div>
+						<div class="akce-meta">📅 ${HejaEvents.formatDate(a.datum)}${a.cas ? ' v ' + a.cas : ''}</div>
 						${a.misto ? '<div class="akce-meta">📍 ' + a.misto + '</div>' : ''}
-						${a.popis ? '<div class="akce-popis">' + a.popis + '</div>' : ''}
+						${a.popis ? '<div class="akce-popis">' + HejaEvents.parseLinks(a.popis) + '</div>' : ''}
 					</li>
 				`).join('');
-			}
-
-			function formatDate(d) {
-				return new Date(`${d}T00:00`).toLocaleDateString('cs-CZ');
 			}
 		</script>
 	</body>
