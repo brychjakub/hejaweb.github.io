@@ -197,6 +197,10 @@ function toEventDate(a) {
   return new Date(`${a.datum}T${a.cas || '23:59'}`);
 }
 
+function toEventDayEnd(a) {
+  return new Date(`${a.datum}T23:59:59`);
+}
+
 function resetFormState(form) {
   form.reset();
   editingId = null;
@@ -220,7 +224,7 @@ function loadAkce() {
       const past = [];
 
       data.forEach(a => {
-        const d = toEventDate(a);
+        const d = toEventDayEnd(a);
         if (d >= now) future.push(a);
         else past.push(a);
       });
