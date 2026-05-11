@@ -70,7 +70,7 @@
 					<p>Všechny zveřejněné akce jsou zde.</p>
 
 					<section>
-						<h2>Současné akce</h2>
+						<h2>Aktuální akce</h2>
 						<ul id="current-akce" class="akce-list">
 							<li><p>Načítám...</p></li>
 						</ul>
@@ -106,6 +106,10 @@
 				return new Date(`${a.datum}T${a.cas || '23:59'}`);
 			}
 
+			function toEventDayEnd(a) {
+				return new Date(`${a.datum}T23:59:59`);
+			}
+
 			function loadAkce() {
 				fetch(API)
 					.then(r => r.json())
@@ -117,7 +121,7 @@
 						data
 							.filter(isPublicEvent)
 							.forEach(a => {
-								const d = toEventDate(a);
+								const d = toEventDayEnd(a);
 								if (d >= now) current.push(a);
 								else past.push(a);
 							});
