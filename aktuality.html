@@ -43,7 +43,7 @@
 					<p>Zde najdete nejnovější informace o koncertech, akcích a vydáních.</p>
 
 					<section>
-						<h2>Nejnovější</h2>
+						<h2>Aktuální akce</h2>
 						<ul class="alt" id="next-event-container">
 							<li id="next-event">
 								<strong>Načítám...</strong>
@@ -74,13 +74,30 @@
 				return new Date(`${a.datum}T${a.cas || '23:59'}`);
 			}
 
+			function toEventDayEnd(a) {
+				return new Date(`${a.datum}T23:59:59`);
+			}
+
+			function parseLinks(text) {
+				if (!text) return '';
+				const urlRegex = /(https?:\/\/[^\s]+)/g;
+				return text.replace(urlRegex, url => {
+					let safeLabel = 'Odkaz';
+					try {
+						const parsed = new URL(url);
+						safeLabel = parsed.hostname.replace(/^www\./, '') + (parsed.pathname && parsed.pathname !== '/' ? '/…' : '');
+					} catch (_) {}
+					return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeLabel}</a>`;
+				});
+			}
+
 			function loadNextEvent() {
 				fetch(API)
 					.then(r => r.json())
 					.then(data => {
 						const now = new Date();
 						const upcomingEvents = data
-							.filter(a => isPublicEvent(a) && toEventDate(a) >= now)
+							.filter(a => isPublicEvent(a) && toEventDayEnd(a) >= now)
 							.sort((a, b) => toEventDate(a) - toEventDate(b));
 
 						if (upcomingEvents.length === 0) {
@@ -99,7 +116,7 @@
 
 						document.getElementById('next-event').innerHTML = `
 							<strong>${event.nazev}</strong><br/>
-							${dateStr}${timeStr}${location}${event.popis ? '<br/>' + event.popis : ''}<br/>
+							${dateStr}${timeStr}${location}${event.popis ? '<br/>' + parseLinks(event.popis) : ''}<br/>
 							<a href="akce.html">Více v Akcích</a>.
 						`;
 					})

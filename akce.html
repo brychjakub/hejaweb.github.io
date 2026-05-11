@@ -70,7 +70,7 @@
 					<p>Všechny zveřejněné akce jsou zde.</p>
 
 					<section>
-						<h2>Současné akce</h2>
+						<h2>Aktuální akce</h2>
 						<ul id="current-akce" class="akce-list">
 							<li><p>Načítám...</p></li>
 						</ul>
@@ -106,6 +106,10 @@
 				return new Date(`${a.datum}T${a.cas || '23:59'}`);
 			}
 
+			function toEventDayEnd(a) {
+				return new Date(`${a.datum}T23:59:59`);
+			}
+
 			function loadAkce() {
 				fetch(API)
 					.then(r => r.json())
@@ -117,7 +121,7 @@
 						data
 							.filter(isPublicEvent)
 							.forEach(a => {
-								const d = toEventDate(a);
+								const d = toEventDayEnd(a);
 								if (d >= now) current.push(a);
 								else past.push(a);
 							});
@@ -143,13 +147,26 @@
 						<strong>${a.nazev}</strong>
 						<div class="akce-meta">📅 ${formatDate(a.datum)}${a.cas ? ' v ' + a.cas : ''}</div>
 						${a.misto ? '<div class="akce-meta">📍 ' + a.misto + '</div>' : ''}
-						${a.popis ? '<div class="akce-popis">' + a.popis + '</div>' : ''}
+						${a.popis ? '<div class="akce-popis">' + parseLinks(a.popis) + '</div>' : ''}
 					</li>
 				`).join('');
 			}
 
 			function formatDate(d) {
 				return new Date(`${d}T00:00`).toLocaleDateString('cs-CZ');
+			}
+
+			function parseLinks(text) {
+				if (!text) return '';
+				const urlRegex = /(https?:\/\/[^\s]+)/g;
+				return text.replace(urlRegex, url => {
+					let safeLabel = 'Odkaz';
+					try {
+						const parsed = new URL(url);
+						safeLabel = parsed.hostname.replace(/^www\./, '') + (parsed.pathname && parsed.pathname !== '/' ? '/…' : '');
+					} catch (_) {}
+					return `<a href="${url}" target="_blank" rel="noopener noreferrer">${safeLabel}</a>`;
+				});
 			}
 		</script>
 	</body>
