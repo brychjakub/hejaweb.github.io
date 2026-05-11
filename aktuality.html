@@ -74,6 +74,10 @@
 				return new Date(`${a.datum}T${a.cas || '23:59'}`);
 			}
 
+			function toEventDayEnd(a) {
+				return new Date(`${a.datum}T23:59:59`);
+			}
+
 			function parseLinks(text) {
 				if (!text) return '';
 				const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -93,7 +97,7 @@
 					.then(data => {
 						const now = new Date();
 						const upcomingEvents = data
-							.filter(a => isPublicEvent(a) && toEventDate(a) >= now)
+							.filter(a => isPublicEvent(a) && toEventDayEnd(a) >= now)
 							.sort((a, b) => toEventDate(a) - toEventDate(b));
 
 						if (upcomingEvents.length === 0) {
