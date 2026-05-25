@@ -1,15 +1,18 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from functools import wraps
+from werkzeug.security import check_password_hash
+import os
+import secrets
 import sqlite3
 
 app = Flask(__name__)
 
 CORS(app, resources={r"/api/*": {"origins": [
-        "https://hejaboys.cz",
-        "https://www.hejaboys.cz",
-        "https://brychjakub.github.io",
-    ]}
-})
+    "https://hejaboys.cz",
+    "https://www.hejaboys.cz",
+    "https://brychjakub.github.io",
+]}})
 
 DB = "/home/HejaBoys/hejaWeb/data.db"
 
@@ -25,6 +28,122 @@ def query(sql, params=(), fetchone=False):
     return (rows[0] if rows else None) if fetchone else rows
 
 
+def init_auth_tables():
+    query("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            role TEXT NOT NULL CHECK (role IN ('admin', 'member')),
+            active INTEGER NOT NULL DEFAULT 1
+        )
+    """)
+
+    query("""
+        CREATE TABLE IF NOT EXISTS sessions (
+            token TEXT PRIMARY KEY,
+            user_id INTEGER NOT NULL,
+            created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        )
+    """)
+
+
+def parse_bearer_token():
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        return auth[7:].strip()
+    return ""
+
+
+def get_current_user():
+    token = parse_bearer_token()
+    if not token:
+        return None
+
+    return query(
+        """
+        SELECT u.id, u.username, u.role
+        FROM sessions s
+        JOIN users u ON u.id = s.user_id
+        WHERE s.token = ? AND u.active = 1
+        """,
+        (token,),
+        fetchone=True,
+    )
+
+
+def require_auth(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        user = get_current_user()
+        if not user:
+            return jsonify({"error": "Unauthorized"}), 401
+        request.current_user = user
+        return f(*args, **kwargs)
+
+    return wrapper
+
+
+def require_admin(f):
+    @wraps(f)
+    @require_auth
+    def wrapper(*args, **kwargs):
+        user = request.current_user
+        if user["role"] != "admin":
+            return jsonify({"error": "Forbidden"}), 403
+        return f(*args, **kwargs)
+
+    return wrapper
+
+
+# AUTH
+@app.route("/api/auth/login", methods=["POST", "OPTIONS"])
+def login():
+    if request.method == "OPTIONS":
+        return "", 200
+
+    data = request.get_json() or {}
+    username = (data.get("username") or "").strip()
+    password = data.get("password") or ""
+
+    if not username or not password:
+        return jsonify({"error": "Missing credentials"}), 400
+
+    user = query(
+        "SELECT id, username, password_hash, role FROM users WHERE username = ? AND active = 1",
+        (username,),
+        fetchone=True,
+    )
+
+    if not user or not check_password_hash(user["password_hash"], password):
+        return jsonify({"error": "Invalid credentials"}), 401
+
+    token = secrets.token_urlsafe(48)
+    query("INSERT INTO sessions (token, user_id) VALUES (?, ?)", (token, user["id"]))
+
+    return jsonify({"token": token, "user": {"username": user["username"], "role": user["role"]}})
+
+
+@app.route("/api/auth/me", methods=["GET"])
+@require_auth
+def me():
+    user = request.current_user
+    return jsonify({"username": user["username"], "role": user["role"]})
+
+
+@app.route("/api/auth/logout", methods=["POST", "OPTIONS"])
+def logout():
+    if request.method == "OPTIONS":
+        return "", 200
+
+    token = parse_bearer_token()
+    if token:
+        query("DELETE FROM sessions WHERE token = ?", (token,))
+
+    return jsonify({"status": "logged_out"})
+
+
 # GET – vypis akci
 @app.route("/api/akce", methods=["GET"])
 def get_akce():
@@ -38,6 +157,10 @@ def get_akce():
             ORDER BY datum ASC, cas ASC
         """)
     else:
+        user = get_current_user()
+        if not user:
+            return jsonify({"error": "Unauthorized"}), 401
+
         rows = query("""
             SELECT id, nazev, datum, misto, cas, popis, public
             FROM akce
@@ -49,10 +172,11 @@ def get_akce():
 
 # POST – pridani akce
 @app.route("/api/akce", methods=["POST", "OPTIONS"])
+@require_admin
 def add_akce():
     if request.method == "OPTIONS":
         return "", 200
-    data = request.get_json()
+    data = request.get_json() or {}
 
     query("""
         INSERT INTO akce (nazev, datum, misto, cas, popis, public)
@@ -71,6 +195,7 @@ def add_akce():
 
 # PUT – uprava akce / zverejneni
 @app.route("/api/akce/<int:id>", methods=["PUT", "OPTIONS"])
+@require_admin
 def update_akce(id):
     if request.method == "OPTIONS":
         return "", 200
@@ -107,6 +232,7 @@ def update_akce(id):
 
 # DELETE – smazani akce
 @app.route("/api/akce/<int:id>", methods=["DELETE", "OPTIONS"])
+@require_admin
 def delete_akce(id):
     if request.method == "OPTIONS":
         return "", 200
@@ -114,6 +240,8 @@ def delete_akce(id):
     query("DELETE FROM akce WHERE id = ?", (id,))
     return jsonify({"status": "deleted"})
 
+
+init_auth_tables()
 
 if __name__ == "__main__":
     app.run()
