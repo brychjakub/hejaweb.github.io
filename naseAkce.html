@@ -54,9 +54,12 @@
     </section>
 
     <section id="content-section" style="display:none;">
-      <p id="user-status"></p>
-      <button id="logout-btn" class="button small">Odhlásit</button>
-      <p>Je to od nejbližších akcí dál, ty co už byly jsou dole.</p>
+      <div class="member-topbar">
+        <p id="user-status" class="user-status"></p>
+        <button id="logout-btn" class="button small">Odhlásit</button>
+      </div>
+
+      <p class="events-order-info">Je to od nejbližších akcí dál, ty co už byly jsou dolu.</p>
 
       <section id="admin-form-section" style="display:none;">
         <h2>Přidat / upravit akci</h2>
@@ -76,6 +79,7 @@
         <div class="section-title">📅 Aktuální akce</div>
         <div id="future-list"></div>
 
+        <hr class="events-divider">
         <div class="section-title">📁 Proběhlé akce</div>
         <div id="past-list"></div>
       </section>
@@ -131,7 +135,7 @@ function setLoggedInState() {
 
   const admin = currentUser.role === 'admin';
   document.getElementById('admin-form-section').style.display = admin ? 'block' : 'none';
-  document.getElementById('user-status').textContent = `Přihlášen jako ${currentUser.username} (${currentUser.role}).`;
+  document.getElementById('user-status').textContent = `Seš tu jako ${currentUser.username} (${currentUser.role}).`;
 }
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
