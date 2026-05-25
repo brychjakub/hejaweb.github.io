@@ -2,7 +2,6 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from functools import wraps
 from werkzeug.security import check_password_hash
-import os
 import secrets
 import sqlite3
 
