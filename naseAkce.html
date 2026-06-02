@@ -62,15 +62,13 @@
         <div class="account-summary">
           <div class="account-main">
             <div class="account-icon" aria-hidden="true">💰</div>
-            <div>
-              <div class="account-label">Stav kapelního účtu</div>
-              <div id="account-balance" class="account-balance">Načítám…</div>
-            </div>
+            <div class="account-label">Stav našeho účtu</div>
           </div>
-          <button type="button" id="account-toggle" class="account-toggle">Zobrazit detail</button>
+          <button type="button" id="account-toggle" class="account-toggle">Zobrazit stav účtu</button>
         </div>
 
         <div id="account-details" class="account-details" style="display:none;">
+          <div id="account-balance" class="account-balance">Načítám…</div>
           <div id="account-updated" class="account-updated"></div>
           <form id="account-form" class="account-form" style="display:none;">
             <label for="account-amount">Nový stav</label>
@@ -84,7 +82,11 @@
         </div>
       </section>
 
-      <section id="admin-form-section" style="display:none;">
+      <div id="admin-actions" class="admin-actions" style="display:none;">
+        <button type="button" id="event-form-toggle" class="event-form-toggle">Přidat akci</button>
+      </div>
+
+      <section id="admin-form-section" class="admin-form-section" style="display:none;">
         <h2>Přidat / upravit akci</h2>
         <p id="edit-info" style="display:none;">✏️ Upravuji existující akci</p>
         <form id="akce-form">
@@ -99,7 +101,7 @@
       </section>
 
       <section>
-        <div class="section-title">📅 Aktuální akce</div>
+        <div class="section-title primary-section-title">📅 Akce</div>
         <p class="current-order-note">Akce jsou seřazené od nejbližší.</p>
         <div id="future-list"></div>
 
@@ -133,6 +135,7 @@ let editingId = null;
 let editingPublic = 0;
 let currentUser = null;
 let accountExpanded = false;
+let eventFormVisible = false;
 let pastEvents = [];
 let pastVisible = false;
 
@@ -166,9 +169,10 @@ function setLoggedInState() {
   document.getElementById('content-section').style.display = 'block';
 
   const admin = currentUser.role === 'admin';
-  document.getElementById('admin-form-section').style.display = admin ? 'block' : 'none';
+  document.getElementById('admin-actions').style.display = admin ? 'flex' : 'none';
   document.getElementById('account-form').style.display = admin ? 'flex' : 'none';
   updateAccountPanelState();
+  updateEventFormState();
 }
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -212,12 +216,27 @@ function updateAccountPanelState() {
   const admin = currentUser && currentUser.role === 'admin';
 
   details.style.display = accountExpanded ? 'block' : 'none';
-  toggle.textContent = accountExpanded ? 'Skrýt detail' : (admin ? 'Zobrazit / upravit' : 'Zobrazit detail');
+  toggle.textContent = accountExpanded ? 'Skrýt stav účtu' : (admin ? 'Zobrazit / upravit stav' : 'Zobrazit stav účtu');
 }
 
 document.getElementById('account-toggle').addEventListener('click', () => {
   accountExpanded = !accountExpanded;
   updateAccountPanelState();
+});
+
+function updateEventFormState() {
+  const admin = currentUser && currentUser.role === 'admin';
+  const formSection = document.getElementById('admin-form-section');
+  const toggle = document.getElementById('event-form-toggle');
+
+  formSection.style.display = admin && eventFormVisible ? 'block' : 'none';
+  if (toggle) toggle.textContent = eventFormVisible ? 'Skrýt formulář' : 'Přidat akci';
+}
+
+document.getElementById('event-form-toggle').addEventListener('click', () => {
+  eventFormVisible = !eventFormVisible;
+  if (!eventFormVisible) resetFormState(document.getElementById('akce-form'));
+  updateEventFormState();
 });
 
 async function loadAccount() {
@@ -431,10 +450,14 @@ document.getElementById('akce-form').addEventListener('submit', async e => {
   });
 
   resetFormState(e.target);
+  eventFormVisible = false;
+  updateEventFormState();
   loadAkce();
 });
 
 function editAkce(a) {
+  eventFormVisible = true;
+  updateEventFormState();
   editingId = a.id;
   editingPublic = HejaEvents.isPublicEvent(a) ? 1 : 0;
   document.getElementById('nazev').value = a.nazev;
