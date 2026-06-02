@@ -104,12 +104,11 @@ button:hover {
   color: inherit;
   text-align: left;
   letter-spacing: 0.04em;
-  transition: padding-left 0.25s ease, background 0.25s ease, color 0.25s ease;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 .action-menu-item:hover,
 .action-menu-item.is-open {
-  padding-left: 1.35em;
   background: rgba(255, 255, 255, 0.045);
   box-shadow: none !important;
   color: #ffffff;
