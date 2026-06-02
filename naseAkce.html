@@ -59,6 +59,22 @@
         <button id="logout-btn" class="button small">Odhlásit</button>
       </div>
 
+      <section id="account-card" class="account-card">
+        <div class="account-summary">
+          <div>
+            <div class="account-label">Stav našeho účtu</div>
+            <div id="account-balance" class="account-balance">Načítám…</div>
+          </div>
+          <div id="account-updated" class="account-updated"></div>
+        </div>
+
+        <form id="account-form" class="account-form" style="display:none;">
+          <input type="number" id="account-amount" placeholder="Částka v Kč" step="1" required>
+          <button type="submit">Uložit stav</button>
+        </form>
+        <p id="account-error" class="account-error" style="display:none;"></p>
+      </section>
+
       <p class="events-order-info">Je to od nejbližších akcí dál, ty co už byly jsou dole.</p>
 
       <section id="admin-form-section" style="display:none;">
@@ -101,6 +117,7 @@
 const API_BASE = 'https://hejaboys.pythonanywhere.com/api';
 const EVENTS_API = `${API_BASE}/akce`;
 const AUTH_API = `${API_BASE}/auth`;
+const ACCOUNT_API = `${API_BASE}/account`;
 let editingId = null;
 let editingPublic = 0;
 let currentUser = null;
@@ -115,6 +132,7 @@ async function init() {
     const me = await fetchJson(`${AUTH_API}/me`, { headers: authHeaders() });
     currentUser = me;
     setLoggedInState();
+    loadAccount();
     loadAkce();
   } catch {
     clearToken();
@@ -135,6 +153,7 @@ function setLoggedInState() {
 
   const admin = currentUser.role === 'admin';
   document.getElementById('admin-form-section').style.display = admin ? 'block' : 'none';
+  document.getElementById('account-form').style.display = admin ? 'flex' : 'none';
   document.getElementById('user-status').textContent = `Seš tu jako ${currentUser.username} (${currentUser.role}).`;
 }
 
@@ -155,6 +174,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
     setToken(res.token);
     currentUser = res.user;
     setLoggedInState();
+    loadAccount();
     loadAkce();
     e.target.reset();
   } catch {
@@ -170,6 +190,72 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
   clearToken();
   currentUser = null;
   location.reload();
+});
+
+async function loadAccount() {
+  const error = document.getElementById('account-error');
+  error.style.display = 'none';
+
+  try {
+    const account = await fetchJson(ACCOUNT_API, { headers: authHeaders() });
+    renderAccount(account);
+  } catch (err) {
+    document.getElementById('account-balance').textContent = 'Nepodařilo se načíst';
+    error.textContent = 'Stav účtu se teď nepovedlo načíst.';
+    error.style.display = 'block';
+  }
+}
+
+function renderAccount(account) {
+  const amount = Number(account.amount_czk || 0);
+  document.getElementById('account-balance').textContent = formatCzk(amount);
+  document.getElementById('account-amount').value = amount;
+
+  const updatedParts = [];
+  if (account.updated_at) updatedParts.push(`upraveno ${formatAccountDate(account.updated_at)}`);
+  if (account.updated_by) updatedParts.push(`od ${account.updated_by}`);
+  document.getElementById('account-updated').textContent = updatedParts.join(' • ');
+}
+
+function formatCzk(amount) {
+  return new Intl.NumberFormat('cs-CZ', {
+    style: 'currency',
+    currency: 'CZK',
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+function formatAccountDate(value) {
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T') + 'Z';
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return date.toLocaleString('cs-CZ', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+document.getElementById('account-form').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const error = document.getElementById('account-error');
+  error.style.display = 'none';
+
+  try {
+    await fetchJson(ACCOUNT_API, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ amount_czk: document.getElementById('account-amount').value })
+    });
+    loadAccount();
+  } catch (err) {
+    error.textContent = 'Stav účtu se nepovedlo uložit.';
+    error.style.display = 'block';
+  }
 });
 
 function resetFormState(form) {

@@ -47,6 +47,18 @@ def init_auth_tables():
         )
     """)
 
+    query("""
+        CREATE TABLE IF NOT EXISTS account_balance (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            amount_czk INTEGER NOT NULL DEFAULT 0,
+            updated_by INTEGER,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (updated_by) REFERENCES users(id)
+        )
+    """)
+
+    query("INSERT OR IGNORE INTO account_balance (id, amount_czk) VALUES (1, 0)")
+
 
 def parse_bearer_token():
     auth = request.headers.get("Authorization", "")
@@ -75,6 +87,9 @@ def get_current_user():
 def require_auth(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return "", 200
+
         user = get_current_user()
         if not user:
             return jsonify({"error": "Unauthorized"}), 401
@@ -141,6 +156,54 @@ def logout():
         query("DELETE FROM sessions WHERE token = ?", (token,))
 
     return jsonify({"status": "logged_out"})
+
+
+# GET – stav spolecneho uctu
+@app.route("/api/account", methods=["GET"])
+@require_auth
+def get_account_balance():
+    account = query(
+        """
+        SELECT a.amount_czk, a.updated_at, u.username AS updated_by
+        FROM account_balance a
+        LEFT JOIN users u ON u.id = a.updated_by
+        WHERE a.id = 1
+        """,
+        fetchone=True,
+    )
+
+    return jsonify({
+        "amount_czk": account["amount_czk"],
+        "updated_at": account["updated_at"],
+        "updated_by": account["updated_by"],
+    })
+
+
+# PUT – uprava stavu spolecneho uctu
+@app.route("/api/account", methods=["PUT", "OPTIONS"])
+@require_admin
+def update_account_balance():
+    if request.method == "OPTIONS":
+        return "", 200
+
+    data = request.get_json() or {}
+
+    try:
+        amount_czk = int(data.get("amount_czk"))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Neplatna castka"}), 400
+
+    user = request.current_user
+    query(
+        """
+        UPDATE account_balance
+        SET amount_czk = ?, updated_by = ?, updated_at = CURRENT_TIMESTAMP
+        WHERE id = 1
+        """,
+        (amount_czk, user["id"]),
+    )
+
+    return jsonify({"status": "updated", "amount_czk": amount_czk})
 
 
 # GET – vypis akci
