@@ -73,3 +73,244 @@ button:hover {
   border-color: rgba(0, 255, 100, 0.7);
   color: #00ff64;
 }
+
+.page-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  margin-bottom: 1.5em;
+}
+
+.page-title-row h1 {
+  margin-bottom: 0;
+}
+
+.action-menu {
+  margin: 0 0 2em 0;
+}
+
+.action-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.95em 1.1em;
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none !important;
+  outline: 0;
+  color: inherit;
+  text-align: left;
+  letter-spacing: 0.04em;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.action-menu-item:hover,
+.action-menu-item.is-open {
+  background: rgba(255, 255, 255, 0.045);
+  box-shadow: none !important;
+  color: #ffffff;
+}
+
+.action-menu-item:focus,
+.action-menu-item:active {
+  box-shadow: none !important;
+}
+
+.action-menu-hint {
+  font-size: 0.78em;
+  opacity: 0.55;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.action-panel {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-0.35em);
+  transition: max-height 0.42s ease, opacity 0.28s ease, transform 0.28s ease, margin 0.28s ease;
+}
+
+.action-panel.is-open {
+  max-height: 900px;
+  margin: 1em 0 1.35em 0;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.account-card {
+  padding: 1.05em 1.15em;
+  border: 1px solid rgba(0, 255, 100, 0.16);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(0, 255, 100, 0.08), rgba(255, 255, 255, 0.025) 48%),
+    rgba(255, 255, 255, 0.035);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
+}
+
+.account-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.account-main {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+}
+
+.account-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4em;
+  height: 2.4em;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.16);
+  font-size: 1.12em;
+}
+
+.account-label {
+  font-size: 0.78em;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.66;
+}
+
+.account-balance {
+  margin-top: 0.08em;
+  font-size: 1.8em;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.account-updated {
+  max-width: 15em;
+  text-align: right;
+  font-size: 0.82em;
+  opacity: 0.58;
+}
+
+.account-form {
+  align-items: center;
+  gap: 0.6em;
+  margin-top: 1em;
+  padding-top: 0.9em;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.account-form label {
+  margin: 0;
+  font-size: 0.86em;
+  opacity: 0.72;
+}
+
+.account-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  flex-wrap: wrap;
+}
+
+.account-form input {
+  max-width: 10em;
+  margin: 0;
+}
+
+.account-currency {
+  opacity: 0.74;
+}
+
+.account-feedback {
+  margin: 0.75em 0 0 0;
+  font-size: 0.92em;
+}
+
+.account-feedback.error {
+  color: #ff8a8a;
+}
+
+.account-feedback.success {
+  color: #00ff64;
+}
+
+.admin-form-section {
+  padding: 1.1em;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.primary-section-title {
+  font-size: 1.45em;
+  opacity: 0.95;
+}
+
+.current-order-note {
+  margin: -0.55em 0 1.25em 0;
+  font-size: 0.92em;
+  opacity: 0.64;
+}
+
+.events-divider {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  margin: 2.1em 0 1.3em 0;
+}
+
+.past-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  margin-bottom: 1em;
+}
+
+.past-title {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.past-toggle {
+  padding: 0.45em 0.8em;
+  white-space: nowrap;
+  font-size: 0.85em;
+  opacity: 0.88;
+}
+
+.past-toggle:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+@media screen and (max-width: 736px) {
+  .page-title-row,
+  .account-summary,
+  .account-form,
+  .past-section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-title-row #logout-btn,
+  .account-main,
+  .action-menu-item,
+  .past-toggle,
+  .account-input-row,
+  .account-form input,
+  .account-form button {
+    width: 100%;
+    max-width: none;
+  }
+
+  .account-updated {
+    max-width: none;
+    text-align: left;
+  }
+}
