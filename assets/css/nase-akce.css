@@ -76,28 +76,19 @@ button:hover {
 
 .member-topbar {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1em;
+  justify-content: flex-end;
   margin-bottom: 1.1em;
 }
 
-.user-status {
-  margin: 0;
-  padding: 0.45em 0.75em;
-  border-left: 3px solid rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.03);
-  font-size: 0.92em;
-  opacity: 0.78;
-}
-
-
 .account-card {
-  margin: 0 0 1.6em 0;
-  padding: 1em 1.1em;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.035);
+  margin: 0 0 1.7em 0;
+  padding: 1.05em 1.15em;
+  border: 1px solid rgba(0, 255, 100, 0.16);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(0, 255, 100, 0.08), rgba(255, 255, 255, 0.025) 48%),
+    rgba(255, 255, 255, 0.035);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.16);
 }
 
 .account-summary {
@@ -107,24 +98,55 @@ button:hover {
   gap: 1em;
 }
 
+.account-main {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+}
+
+.account-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4em;
+  height: 2.4em;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.16);
+  font-size: 1.12em;
+}
+
 .account-label {
-  font-size: 0.85em;
-  letter-spacing: 0.08em;
+  font-size: 0.78em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  opacity: 0.65;
+  opacity: 0.66;
 }
 
 .account-balance {
-  margin-top: 0.12em;
-  font-size: 1.55em;
-  font-weight: 700;
+  margin-top: 0.08em;
+  font-size: 1.8em;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.account-toggle,
+.past-toggle {
+  padding: 0.45em 0.8em;
+  white-space: nowrap;
+  font-size: 0.85em;
+  opacity: 0.88;
+}
+
+.account-details {
+  margin-top: 0.95em;
+  padding-top: 0.85em;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .account-updated {
-  max-width: 15em;
-  text-align: right;
-  font-size: 0.82em;
-  opacity: 0.58;
+  font-size: 0.84em;
+  opacity: 0.62;
 }
 
 .account-form {
@@ -133,27 +155,45 @@ button:hover {
   margin-top: 0.9em;
 }
 
-.account-form input {
-  max-width: 12em;
+.account-form label {
+  margin: 0;
+  font-size: 0.86em;
+  opacity: 0.72;
 }
 
-.account-error {
-  margin: 0.7em 0 0 0;
-  color: #ff6b6b;
+.account-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45em;
+  flex-wrap: wrap;
+}
+
+.account-form input {
+  max-width: 10em;
+  margin: 0;
+}
+
+.account-currency {
+  opacity: 0.74;
+}
+
+.account-feedback {
+  margin: 0.75em 0 0 0;
   font-size: 0.92em;
 }
 
-.events-order-info {
-  margin: 0 auto 2em auto;
-  max-width: 44rem;
-  padding: 0.85em 1.1em;
-  text-align: center;
-  font-size: 1.05em;
-  font-weight: 600;
-  opacity: 0.97;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.04);
+.account-feedback.error {
+  color: #ff8a8a;
+}
+
+.account-feedback.success {
+  color: #00ff64;
+}
+
+.current-order-note {
+  margin: -0.55em 0 1.25em 0;
+  font-size: 0.92em;
+  opacity: 0.64;
 }
 
 .events-divider {
@@ -162,16 +202,42 @@ button:hover {
   margin: 2.1em 0 1.3em 0;
 }
 
+.past-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+  margin-bottom: 1em;
+}
+
+.past-title {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.past-toggle:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 @media screen and (max-width: 736px) {
-  .member-topbar,
   .account-summary,
-  .account-form {
+  .account-form,
+  .past-section-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
-  .account-updated {
+  .account-main {
+    align-items: flex-start;
+  }
+
+  .account-toggle,
+  .past-toggle,
+  .account-input-row,
+  .account-form input,
+  .account-form button {
+    width: 100%;
     max-width: none;
-    text-align: left;
   }
 }

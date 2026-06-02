@@ -55,27 +55,34 @@
 
     <section id="content-section" style="display:none;">
       <div class="member-topbar">
-        <p id="user-status" class="user-status"></p>
         <button id="logout-btn" class="button small">Odhlásit</button>
       </div>
 
-      <section id="account-card" class="account-card">
+      <section id="account-card" class="account-card" aria-live="polite">
         <div class="account-summary">
-          <div>
-            <div class="account-label">Stav našeho účtu</div>
-            <div id="account-balance" class="account-balance">Načítám…</div>
+          <div class="account-main">
+            <div class="account-icon" aria-hidden="true">💰</div>
+            <div>
+              <div class="account-label">Stav našeho účtu</div>
+              <div id="account-balance" class="account-balance">Načítám…</div>
+            </div>
           </div>
-          <div id="account-updated" class="account-updated"></div>
+          <button type="button" id="account-toggle" class="account-toggle">Zobrazit detail</button>
         </div>
 
-        <form id="account-form" class="account-form" style="display:none;">
-          <input type="number" id="account-amount" placeholder="Částka v Kč" step="1" required>
-          <button type="submit">Uložit stav</button>
-        </form>
-        <p id="account-error" class="account-error" style="display:none;"></p>
+        <div id="account-details" class="account-details" style="display:none;">
+          <div id="account-updated" class="account-updated"></div>
+          <form id="account-form" class="account-form" style="display:none;">
+            <label for="account-amount">Nový stav</label>
+            <div class="account-input-row">
+              <input type="number" id="account-amount" placeholder="Částka" step="1" inputmode="numeric" required>
+              <span class="account-currency">Kč</span>
+              <button type="submit" id="account-submit-btn">Uložit</button>
+            </div>
+          </form>
+          <p id="account-feedback" class="account-feedback" style="display:none;"></p>
+        </div>
       </section>
-
-      <p class="events-order-info">Je to od nejbližších akcí dál, ty co už byly jsou dole.</p>
 
       <section id="admin-form-section" style="display:none;">
         <h2>Přidat / upravit akci</h2>
@@ -93,11 +100,15 @@
 
       <section>
         <div class="section-title">📅 Aktuální akce</div>
+        <p class="current-order-note">Akce jsou seřazené od nejbližší.</p>
         <div id="future-list"></div>
 
         <hr class="events-divider">
-        <div class="section-title">📁 Proběhlé akce</div>
-        <div id="past-list"></div>
+        <div class="past-section-header">
+          <div class="section-title past-title">📁 Proběhlé akce</div>
+          <button type="button" id="past-toggle" class="past-toggle">Zobrazit proběhlé akce</button>
+        </div>
+        <div id="past-list" style="display:none;"></div>
       </section>
     </section>
   </div>
@@ -121,6 +132,9 @@ const ACCOUNT_API = `${API_BASE}/account`;
 let editingId = null;
 let editingPublic = 0;
 let currentUser = null;
+let accountExpanded = false;
+let pastEvents = [];
+let pastVisible = false;
 
 init();
 
@@ -154,7 +168,7 @@ function setLoggedInState() {
   const admin = currentUser.role === 'admin';
   document.getElementById('admin-form-section').style.display = admin ? 'block' : 'none';
   document.getElementById('account-form').style.display = admin ? 'flex' : 'none';
-  document.getElementById('user-status').textContent = `Seš tu jako ${currentUser.username} (${currentUser.role}).`;
+  updateAccountPanelState();
 }
 
 document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -192,17 +206,29 @@ document.getElementById('logout-btn').addEventListener('click', async () => {
   location.reload();
 });
 
+function updateAccountPanelState() {
+  const details = document.getElementById('account-details');
+  const toggle = document.getElementById('account-toggle');
+  const admin = currentUser && currentUser.role === 'admin';
+
+  details.style.display = accountExpanded ? 'block' : 'none';
+  toggle.textContent = accountExpanded ? 'Skrýt detail' : (admin ? 'Zobrazit / upravit' : 'Zobrazit detail');
+}
+
+document.getElementById('account-toggle').addEventListener('click', () => {
+  accountExpanded = !accountExpanded;
+  updateAccountPanelState();
+});
+
 async function loadAccount() {
-  const error = document.getElementById('account-error');
-  error.style.display = 'none';
+  hideAccountMessage();
 
   try {
     const account = await fetchJson(ACCOUNT_API, { headers: authHeaders() });
     renderAccount(account);
   } catch (err) {
     document.getElementById('account-balance').textContent = 'Nepodařilo se načíst';
-    error.textContent = 'Stav účtu se teď nepovedlo načíst.';
-    error.style.display = 'block';
+    showAccountMessage(`Stav účtu se teď nepovedlo načíst. ${describeAccountError(err)}`);
   }
 }
 
@@ -211,10 +237,9 @@ function renderAccount(account) {
   document.getElementById('account-balance').textContent = formatCzk(amount);
   document.getElementById('account-amount').value = amount;
 
-  const updatedParts = [];
-  if (account.updated_at) updatedParts.push(`upraveno ${formatAccountDate(account.updated_at)}`);
-  if (account.updated_by) updatedParts.push(`od ${account.updated_by}`);
-  document.getElementById('account-updated').textContent = updatedParts.join(' • ');
+  document.getElementById('account-updated').textContent = account.updated_at
+    ? `Naposledy změněno: ${formatAccountDate(account.updated_at)}`
+    : 'Zatím bez změny';
 }
 
 function formatCzk(amount) {
@@ -239,22 +264,48 @@ function formatAccountDate(value) {
   });
 }
 
+function showAccountMessage(message, type = 'error') {
+  const feedback = document.getElementById('account-feedback');
+  feedback.textContent = message;
+  feedback.className = `account-feedback ${type}`;
+  feedback.style.display = 'block';
+}
+
+function hideAccountMessage() {
+  document.getElementById('account-feedback').style.display = 'none';
+}
+
+function describeAccountError(err) {
+  if (err.status === 400) return err.message || 'Zkontroluj prosím částku.';
+  if (err.status === 401) return 'Přihlášení nejspíš vypršelo, zkus se přihlásit znovu.';
+  if (err.status === 403) return 'Upravovat ji může jen admin účet.';
+  if (err.status === 404) return 'Na PythonAnywhere je potřeba nahrát nový backend a reloadnout web app.';
+  if (err.message) return err.message;
+  return 'Zkus reload stránky, případně PythonAnywhere web app.';
+}
+
 document.getElementById('account-form').addEventListener('submit', async e => {
   e.preventDefault();
+  hideAccountMessage();
 
-  const error = document.getElementById('account-error');
-  error.style.display = 'none';
+  const submit = document.getElementById('account-submit-btn');
+  const amountValue = document.getElementById('account-amount').value;
+  submit.disabled = true;
+  submit.textContent = 'Ukládám…';
 
   try {
-    await fetchJson(ACCOUNT_API, {
+    const account = await fetchJson(ACCOUNT_API, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
-      body: JSON.stringify({ amount_czk: document.getElementById('account-amount').value })
+      body: JSON.stringify({ amount_czk: amountValue })
     });
-    loadAccount();
+    renderAccount(account);
+    showAccountMessage('Stav účtu uložen.', 'success');
   } catch (err) {
-    error.textContent = 'Stav účtu se nepovedlo uložit.';
-    error.style.display = 'block';
+    showAccountMessage(`Stav účtu se nepovedlo uložit. ${describeAccountError(err)}`);
+  } finally {
+    submit.disabled = false;
+    submit.textContent = 'Uložit';
   }
 });
 
@@ -277,9 +328,34 @@ async function loadAkce() {
     if (d >= now) future.push(a); else past.push(a);
   });
 
+  pastEvents = past;
   renderList('future-list', future);
-  renderList('past-list', past);
+  updatePastSection();
 }
+
+function updatePastSection() {
+  const list = document.getElementById('past-list');
+  const toggle = document.getElementById('past-toggle');
+  const count = pastEvents.length;
+
+  toggle.disabled = count === 0;
+  toggle.textContent = count === 0
+    ? 'Žádné proběhlé akce'
+    : `${pastVisible ? 'Skrýt' : 'Zobrazit'} proběhlé akce (${count})`;
+
+  list.style.display = pastVisible && count > 0 ? 'block' : 'none';
+
+  if (pastVisible && count > 0) {
+    renderList('past-list', pastEvents);
+  } else {
+    list.innerHTML = '';
+  }
+}
+
+document.getElementById('past-toggle').addEventListener('click', () => {
+  pastVisible = !pastVisible;
+  updatePastSection();
+});
 
 function renderList(id, data) {
   const container = document.getElementById(id);
@@ -380,8 +456,26 @@ async function deleteAkce(id) {
 
 async function fetchJson(url, options = {}) {
   const res = await fetch(url, options);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  const text = await res.text();
+  let payload = null;
+
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = { error: text };
+    }
+  }
+
+  if (!res.ok) {
+    const message = payload && payload.error ? payload.error : `HTTP ${res.status}`;
+    const error = new Error(message);
+    error.status = res.status;
+    error.payload = payload;
+    throw error;
+  }
+
+  return payload;
 }
 </script>
 

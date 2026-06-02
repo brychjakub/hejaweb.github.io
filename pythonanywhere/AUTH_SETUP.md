@@ -46,3 +46,12 @@ python3 create_user.py --username nekdo --role member --inactive
 - `admin`: může číst + **CRUD + zveřejňovat**.
 
 Tohle je vynucené backendem, ne jen frontendem.
+
+## Když nejde uložit stav účtu
+
+Po nahrání nové verze backendu na PythonAnywhere je potřeba v administraci PythonAnywhere kliknout na **Reload** u web appky. Backend si po reloadu automaticky vytvoří tabulku `account_balance` a výchozí stav `0 Kč`.
+
+Pokud se pořád zobrazuje chyba ukládání, zkontroluj:
+- že jsi přihlášený jako účet s rolí `admin`,
+- že web appka na PythonAnywhere běží na aktuální verzi `app.py`,
+- že databázový soubor `/home/HejaBoys/hejaWeb/data.db` je zapisovatelný pro web appku.

@@ -27,6 +27,20 @@ def query(sql, params=(), fetchone=False):
     return (rows[0] if rows else None) if fetchone else rows
 
 
+def ensure_account_balance_table():
+    query("""
+        CREATE TABLE IF NOT EXISTS account_balance (
+            id INTEGER PRIMARY KEY CHECK (id = 1),
+            amount_czk INTEGER NOT NULL DEFAULT 0,
+            updated_by INTEGER,
+            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (updated_by) REFERENCES users(id)
+        )
+    """)
+
+    query("INSERT OR IGNORE INTO account_balance (id, amount_czk) VALUES (1, 0)")
+
+
 def init_auth_tables():
     query("""
         CREATE TABLE IF NOT EXISTS users (
@@ -47,17 +61,7 @@ def init_auth_tables():
         )
     """)
 
-    query("""
-        CREATE TABLE IF NOT EXISTS account_balance (
-            id INTEGER PRIMARY KEY CHECK (id = 1),
-            amount_czk INTEGER NOT NULL DEFAULT 0,
-            updated_by INTEGER,
-            updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (updated_by) REFERENCES users(id)
-        )
-    """)
-
-    query("INSERT OR IGNORE INTO account_balance (id, amount_czk) VALUES (1, 0)")
+    ensure_account_balance_table()
 
 
 def parse_bearer_token():
@@ -158,10 +162,9 @@ def logout():
     return jsonify({"status": "logged_out"})
 
 
-# GET – stav spolecneho uctu
-@app.route("/api/account", methods=["GET"])
-@require_auth
-def get_account_balance():
+def get_account_payload():
+    ensure_account_balance_table()
+
     account = query(
         """
         SELECT a.amount_czk, a.updated_at, u.username AS updated_by
@@ -172,11 +175,18 @@ def get_account_balance():
         fetchone=True,
     )
 
-    return jsonify({
+    return {
         "amount_czk": account["amount_czk"],
         "updated_at": account["updated_at"],
         "updated_by": account["updated_by"],
-    })
+    }
+
+
+# GET – stav spolecneho uctu
+@app.route("/api/account", methods=["GET"])
+@require_auth
+def get_account_balance():
+    return jsonify(get_account_payload())
 
 
 # PUT – uprava stavu spolecneho uctu
@@ -203,7 +213,10 @@ def update_account_balance():
         (amount_czk, user["id"]),
     )
 
-    return jsonify({"status": "updated", "amount_czk": amount_czk})
+    payload = get_account_payload()
+    payload["status"] = "updated"
+
+    return jsonify(payload)
 
 
 # GET – vypis akci
