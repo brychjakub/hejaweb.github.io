@@ -96,9 +96,11 @@ button:hover {
   justify-content: space-between;
   width: 100%;
   padding: 0.95em 0.15em;
-  border: 0;
+  border: 0 !important;
   border-radius: 0;
   background: transparent;
+  box-shadow: none !important;
+  outline: 0;
   color: inherit;
   text-align: left;
   letter-spacing: 0.04em;
@@ -109,7 +111,13 @@ button:hover {
 .action-menu-item.is-open {
   padding-left: 0.85em;
   background: rgba(255, 255, 255, 0.045);
+  box-shadow: none !important;
   color: #ffffff;
+}
+
+.action-menu-item:focus,
+.action-menu-item:active {
+  box-shadow: none !important;
 }
 
 .action-menu-hint {
