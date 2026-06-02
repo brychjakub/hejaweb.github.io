@@ -1,16 +1,12 @@
 <!DOCTYPE HTML>
-
 <html lang="cs">
 <head>
   <title>Naše akce | Heja Boys</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
   <link rel="stylesheet" href="assets/css/main.css" />
   <link rel="icon" type="image/x-icon" href="images/favicon.ico">
   <link rel="stylesheet" href="assets/css/nase-akce.css" />
-
-
 </head>
 
 <body class="is-preload">
@@ -22,112 +18,375 @@
       <span class="symbol"><img src="images/logoFull.jpg" alt=""></span>
       <span class="title">Heja Boys</span>
     </a>
+    <nav>
+      <ul>
+        <li><a href="#menu">Menu</a></li>
+      </ul>
+    </nav>
   </div>
 </header>
 
+<nav id="menu">
+  <h2>Menu</h2>
+  <ul>
+    <li><a href="index.html">Domů</a></li>
+    <li><a href="aktuality.html">Aktuality</a></li>
+    <li><a href="akce.html">Akce</a></li>
+    <li><a href="alba.html">Alba</a></li>
+    <li><a href="merch.html">Merch</a></li>
+    <li><a href="naseAkce.html">Naše akce</a></li>
+    <li><a href="onas.html">O nás</a></li>
+  </ul>
+</nav>
+
 <div id="main">
   <div class="inner">
+    <div class="page-title-row">
+      <h1>Naše akce</h1>
+      <button id="logout-btn" class="button small" style="display:none;">Odhlásit</button>
+    </div>
 
+    <section id="login-section">
+      <h2>Přihlášení členů</h2>
+      <form id="login-form">
+        <input type="text" id="username" placeholder="Uživatelské jméno" required>
+        <input type="password" id="password" placeholder="Heslo" required>
+        <button type="submit">Přihlásit</button>
+      </form>
+      <p id="login-error" style="display:none;color:#ff6b6b;">Neplatné přihlašovací údaje.</p>
+    </section>
 
-<h1>Naše akce</h1>
-    <p>Je to od nejbližších akcí dál, ty co už byly jsou dolu, upravovat může každej tak žádný pičoviny...prosím</p>
+    <section id="content-section" style="display:none;">
+      <nav class="action-menu" aria-label="Možnosti stránky">
+        <button type="button" id="account-toggle" class="action-menu-item" aria-expanded="false" aria-controls="account-details">
+          <span>Stav účtu</span>
+          <span class="action-menu-hint">zobrazit</span>
+        </button>
+        <div id="account-details" class="action-panel account-panel">
+          <section id="account-card" class="account-card" aria-live="polite">
+            <div class="account-summary">
+              <div class="account-main">
+                <div class="account-icon" aria-hidden="true">💰</div>
+                <div>
+                  <div class="account-label">Stav našeho účtu</div>
+                  <div id="account-balance" class="account-balance">Načítám…</div>
+                </div>
+              </div>
+              <div id="account-updated" class="account-updated"></div>
+            </div>
+            <form id="account-form" class="account-form" style="display:none;">
+              <label for="account-amount">Nový stav</label>
+              <div class="account-input-row">
+                <input type="number" id="account-amount" placeholder="Částka" step="1" inputmode="numeric" required>
+                <span class="account-currency">Kč</span>
+                <button type="submit" id="account-submit-btn">Uložit</button>
+              </div>
+            </form>
+            <p id="account-feedback" class="account-feedback" style="display:none;"></p>
+          </section>
+        </div>
 
-<!-- FORM -->
-<section>
-  <h2>Přidat / upravit akci</h2>
+        <button type="button" id="event-form-toggle" class="action-menu-item" aria-expanded="false" aria-controls="admin-form-section" style="display:none;">
+          <span>Přidat akci</span>
+          <span class="action-menu-hint">otevřít</span>
+        </button>
+        <section id="admin-form-section" class="action-panel admin-form-section">
+          <h2>Přidat / upravit akci</h2>
+          <p id="edit-info" style="display:none;">✏️ Upravuji existující akci</p>
+          <form id="akce-form">
+            <input type="text" id="nazev" placeholder="Název" required>
+            <input type="date" id="datum" required>
+            <input type="time" id="cas">
+            <input type="text" id="misto" placeholder="Místo">
+            <textarea id="popis" placeholder="Popis"></textarea>
+            <button type="submit" id="submit-btn">Uložit akci</button>
+          </form>
+        </section>
+      </nav>
 
-  <p id="edit-info" style="display:none;">
-    ✏️ Upravuji existující akci
-  </p>
+      <section>
+        <div class="section-title primary-section-title">📅 Akce</div>
+        <p class="current-order-note">Akce jsou seřazené od nejbližší.</p>
+        <div id="future-list"></div>
 
-  <form id="akce-form">
-    <input type="text" id="nazev" placeholder="Název" required>
-    <input type="date" id="datum" required>
-    <input type="time" id="cas">
-    <input type="text" id="misto" placeholder="Místo">
-    <textarea id="popis" placeholder="Popis"></textarea>
-    <button type="submit" id="submit-btn">Uložit akci</button>
-  </form>
-</section>
-
-<hr>
-
-<!-- LIST -->
-<section>
-  <div class="section-title">📅 Aktuální akce</div>
-  <div id="future-list"></div>
-
-  <div class="section-title">📁 Proběhlé akce</div>
-  <div id="past-list"></div>
-</section>
-
+        <hr class="events-divider">
+        <div class="past-section-header">
+          <div class="section-title past-title">📁 Proběhlé akce</div>
+          <button type="button" id="past-toggle" class="past-toggle">Zobrazit proběhlé akce</button>
+        </div>
+        <div id="past-list" style="display:none;"></div>
+      </section>
+    </section>
   </div>
 </div>
 
 </div>
 
-<!-- TEMPLATE SCRIPTS -->
-
 <script src="assets/js/jquery.min.js"></script>
-
 <script src="assets/js/browser.min.js"></script>
-
 <script src="assets/js/breakpoints.min.js"></script>
-
 <script src="assets/js/util.js"></script>
-
 <script src="assets/js/main.js"></script>
 <script src="assets/js/footer.js"></script>
 <script src="assets/js/events-common.js"></script>
 
-<!-- APP SCRIPT -->
-
 <script>
-const API = 'https://hejaboys.pythonanywhere.com/api/akce';
+const API_BASE = 'https://hejaboys.pythonanywhere.com/api';
+const EVENTS_API = `${API_BASE}/akce`;
+const AUTH_API = `${API_BASE}/auth`;
+const ACCOUNT_API = `${API_BASE}/account`;
 let editingId = null;
 let editingPublic = 0;
+let currentUser = null;
+let accountExpanded = false;
+let eventFormVisible = false;
+let pastEvents = [];
+let pastVisible = false;
 
-loadAkce();
+init();
+
+async function init() {
+  const token = getToken();
+  if (!token) return;
+
+  try {
+    const me = await fetchJson(`${AUTH_API}/me`, { headers: authHeaders() });
+    currentUser = me;
+    setLoggedInState();
+    loadAccount();
+    loadAkce();
+  } catch {
+    clearToken();
+  }
+}
+
+function authHeaders() {
+  return { 'Authorization': `Bearer ${getToken()}` };
+}
+
+function getToken() { return localStorage.getItem('heja_token'); }
+function setToken(token) { localStorage.setItem('heja_token', token); }
+function clearToken() { localStorage.removeItem('heja_token'); }
+
+function setLoggedInState() {
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('content-section').style.display = 'block';
+
+  const admin = currentUser.role === 'admin';
+  document.getElementById('logout-btn').style.display = 'inline-block';
+  document.getElementById('event-form-toggle').style.display = admin ? 'flex' : 'none';
+  document.getElementById('account-form').style.display = admin ? 'flex' : 'none';
+  updateAccountPanelState();
+  updateEventFormState();
+}
+
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  document.getElementById('login-error').style.display = 'none';
+
+  try {
+    const res = await fetchJson(`${AUTH_API}/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value
+      })
+    });
+
+    setToken(res.token);
+    currentUser = res.user;
+    setLoggedInState();
+    loadAccount();
+    loadAkce();
+    e.target.reset();
+  } catch {
+    document.getElementById('login-error').style.display = 'block';
+  }
+});
+
+document.getElementById('logout-btn').addEventListener('click', async () => {
+  try {
+    await fetch(`${AUTH_API}/logout`, { method: 'POST', headers: authHeaders() });
+  } catch {}
+
+  clearToken();
+  currentUser = null;
+  location.reload();
+});
+
+function updateAccountPanelState() {
+  const details = document.getElementById('account-details');
+  const toggle = document.getElementById('account-toggle');
+  const admin = currentUser && currentUser.role === 'admin';
+
+  details.classList.toggle('is-open', accountExpanded);
+  toggle.classList.toggle('is-open', accountExpanded);
+  toggle.setAttribute('aria-expanded', accountExpanded ? 'true' : 'false');
+  toggle.querySelector('.action-menu-hint').textContent = accountExpanded ? 'skrýt' : (admin ? 'zobrazit / upravit' : 'zobrazit');
+}
+
+document.getElementById('account-toggle').addEventListener('click', () => {
+  accountExpanded = !accountExpanded;
+  updateAccountPanelState();
+});
+
+function updateEventFormState() {
+  const admin = currentUser && currentUser.role === 'admin';
+  const formSection = document.getElementById('admin-form-section');
+  const toggle = document.getElementById('event-form-toggle');
+
+  formSection.classList.toggle('is-open', admin && eventFormVisible);
+  if (toggle) {
+    toggle.classList.toggle('is-open', eventFormVisible);
+    toggle.setAttribute('aria-expanded', eventFormVisible ? 'true' : 'false');
+    toggle.querySelector('.action-menu-hint').textContent = eventFormVisible ? 'skrýt' : 'otevřít';
+  }
+}
+
+document.getElementById('event-form-toggle').addEventListener('click', () => {
+  eventFormVisible = !eventFormVisible;
+  if (!eventFormVisible) resetFormState(document.getElementById('akce-form'));
+  updateEventFormState();
+});
+
+async function loadAccount() {
+  hideAccountMessage();
+
+  try {
+    const account = await fetchJson(ACCOUNT_API, { headers: authHeaders() });
+    renderAccount(account);
+  } catch (err) {
+    document.getElementById('account-balance').textContent = 'Nepodařilo se načíst';
+    showAccountMessage(`Stav účtu se teď nepovedlo načíst. ${describeAccountError(err)}`);
+  }
+}
+
+function renderAccount(account) {
+  const amount = Number(account.amount_czk || 0);
+  document.getElementById('account-balance').textContent = formatCzk(amount);
+  document.getElementById('account-amount').value = amount;
+
+  document.getElementById('account-updated').textContent = account.updated_at
+    ? `Naposledy změněno: ${formatAccountDate(account.updated_at)}`
+    : 'Zatím bez změny';
+}
+
+function formatCzk(amount) {
+  return new Intl.NumberFormat('cs-CZ', {
+    style: 'currency',
+    currency: 'CZK',
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+function formatAccountDate(value) {
+  const normalized = value.includes('T') ? value : value.replace(' ', 'T') + 'Z';
+  const date = new Date(normalized);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return date.toLocaleString('cs-CZ', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function showAccountMessage(message, type = 'error') {
+  const feedback = document.getElementById('account-feedback');
+  feedback.textContent = message;
+  feedback.className = `account-feedback ${type}`;
+  feedback.style.display = 'block';
+}
+
+function hideAccountMessage() {
+  document.getElementById('account-feedback').style.display = 'none';
+}
+
+function describeAccountError(err) {
+  if (err.status === 400) return err.message || 'Zkontroluj prosím částku.';
+  if (err.status === 401) return 'Přihlášení nejspíš vypršelo, zkus se přihlásit znovu.';
+  if (err.status === 403) return 'Upravovat ji může jen admin účet.';
+  if (err.status === 404) return 'Na PythonAnywhere je potřeba nahrát nový backend a reloadnout web app.';
+  if (err.message) return err.message;
+  return 'Zkus reload stránky, případně PythonAnywhere web app.';
+}
+
+document.getElementById('account-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  hideAccountMessage();
+
+  const submit = document.getElementById('account-submit-btn');
+  const amountValue = document.getElementById('account-amount').value;
+  submit.disabled = true;
+  submit.textContent = 'Ukládám…';
+
+  try {
+    const account = await fetchJson(ACCOUNT_API, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ amount_czk: amountValue })
+    });
+    renderAccount(account);
+    showAccountMessage('Stav účtu uložen.', 'success');
+  } catch (err) {
+    showAccountMessage(`Stav účtu se nepovedlo uložit. ${describeAccountError(err)}`);
+  } finally {
+    submit.disabled = false;
+    submit.textContent = 'Uložit';
+  }
+});
 
 function resetFormState(form) {
   form.reset();
   editingId = null;
   editingPublic = 0;
-
   document.getElementById('edit-info').style.display = 'none';
   document.getElementById('submit-btn').textContent = 'Uložit akci';
 }
 
-// =====================
-// LOAD
-// =====================
-function loadAkce() {
-  fetch(API)
-    .then(r => r.json())
-    .then(data => {
+async function loadAkce() {
+  const data = await fetchJson(EVENTS_API, { headers: authHeaders() });
+  const now = new Date();
+  const future = [];
+  const past = [];
 
-      const now = new Date();
+  data.forEach(a => {
+    const d = HejaEvents.toEventDayEnd(a);
+    if (d >= now) future.push(a); else past.push(a);
+  });
 
-      const future = [];
-      const past = [];
-
-      data.forEach(a => {
-        const d = HejaEvents.toEventDayEnd(a);
-        if (d >= now) future.push(a);
-        else past.push(a);
-      });
-
-      renderList('future-list', future);
-      renderList('past-list', past);
-    })
-    .catch(err => {
-      console.error('Chyba načítání:', err);
-    });
+  pastEvents = past;
+  renderList('future-list', future);
+  updatePastSection();
 }
 
-// =====================
-// RENDER
-// =====================
+function updatePastSection() {
+  const list = document.getElementById('past-list');
+  const toggle = document.getElementById('past-toggle');
+  const count = pastEvents.length;
+
+  toggle.disabled = count === 0;
+  toggle.textContent = count === 0
+    ? 'Žádné proběhlé akce'
+    : `${pastVisible ? 'Skrýt' : 'Zobrazit'} proběhlé akce (${count})`;
+
+  list.style.display = pastVisible && count > 0 ? 'block' : 'none';
+
+  if (pastVisible && count > 0) {
+    renderList('past-list', pastEvents);
+  } else {
+    list.innerHTML = '';
+  }
+}
+
+document.getElementById('past-toggle').addEventListener('click', () => {
+  pastVisible = !pastVisible;
+  updatePastSection();
+});
+
 function renderList(id, data) {
   const container = document.getElementById(id);
   container.innerHTML = '';
@@ -137,76 +396,52 @@ function renderList(id, data) {
     return;
   }
 
+  const admin = currentUser && currentUser.role === 'admin';
+
   data.forEach(a => {
     const div = document.createElement('div');
     div.className = 'akce-card';
-
     const isPublic = HejaEvents.isPublicEvent(a);
 
     div.innerHTML = `
       <div class="akce-header">
         <div class="akce-title">${a.nazev}</div>
-        <div class="akce-date">
-          ${HejaEvents.formatDate(a.datum)} ${a.cas ? 'v ' + a.cas : ''}
-        </div>
+        <div class="akce-date">${HejaEvents.formatDate(a.datum)} ${a.cas ? 'v ' + a.cas : ''}</div>
       </div>
-
-      <div class="akce-meta">
-        ${a.misto ? '📍 ' + a.misto : ''}
-      </div>
-
-      <div class="akce-status ${isPublic ? 'public' : 'private'}">
-        ${isPublic ? '🌍 Veřejná akce' : '🔒 Interní akce'}
-      </div>
-
+      <div class="akce-meta">${a.misto ? '📍 ' + a.misto : ''}</div>
+      <div class="akce-status ${isPublic ? 'public' : 'private'}">${isPublic ? '🌍 Veřejná akce' : '🔒 Interní akce'}</div>
       <div>${HejaEvents.parseLinks(a.popis || '', { linkStyle: 'color: #00ff64; text-decoration: underline;' })}</div>
-
-      <div class="akce-actions">
-	<button class="publish-btn ${isPublic ? 'published' : ''}" data-id="${a.id}" data-public="${isPublic ? 1 : 0}">
-  ${isPublic ? '✓ Zveřejněná' : '🔒 Zveřejnit'}
-</button>
-        <button class="edit-btn">✏️ Upravit</button>
-        <button class="delete-btn">🗑️ Smazat</button>
-      </div>
+      <div class="akce-actions"></div>
     `;
 
-    div.querySelector('.publish-btn').addEventListener('click', () => togglePublish(a.id, isPublic));
-    div.querySelector('.edit-btn').addEventListener('click', () => editAkce(a));
-    div.querySelector('.delete-btn').addEventListener('click', () => deleteAkce(a.id));
+    const actions = div.querySelector('.akce-actions');
+    if (admin) {
+      actions.innerHTML = `
+        <button class="publish-btn ${isPublic ? 'published' : ''}">${isPublic ? '✓ Zveřejněná' : '🔒 Zveřejnit'}</button>
+        <button class="edit-btn">✏️ Upravit</button>
+        <button class="delete-btn">🗑️ Smazat</button>
+      `;
+      actions.querySelector('.publish-btn').addEventListener('click', () => togglePublish(a.id, isPublic));
+      actions.querySelector('.edit-btn').addEventListener('click', () => editAkce(a));
+      actions.querySelector('.delete-btn').addEventListener('click', () => deleteAkce(a.id));
+    }
 
     container.appendChild(div);
   });
 }
 
-// =====================
-// PUBLISH / UNPUBLISH
-// =====================
-function togglePublish(id, currentPublic) {
+async function togglePublish(id, currentPublic) {
   const newPublic = currentPublic ? 0 : 1;
-
-  fetch(`${API}/${id}`, {
+  await fetchJson(`${EVENTS_API}/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify({ public: newPublic })
-  })
-  .then(r => {
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
-  })
-  .then(() => {
-    loadAkce();
-  })
-  .catch(err => {
-    console.error('Chyba zveřejňování:', err);
   });
+  loadAkce();
 }
 
-// =====================
-// SUBMIT
-// =====================
-document.getElementById('akce-form').addEventListener('submit', e => {
+document.getElementById('akce-form').addEventListener('submit', async e => {
   e.preventDefault();
-
   const data = {
     nazev: document.getElementById('nazev').value,
     datum: document.getElementById('datum').value,
@@ -217,67 +452,65 @@ document.getElementById('akce-form').addEventListener('submit', e => {
   };
 
   const method = editingId ? 'PUT' : 'POST';
-  const url = editingId ? `${API}/${editingId}` : API;
+  const url = editingId ? `${EVENTS_API}/${editingId}` : EVENTS_API;
 
-  fetch(url, {
-    method: method,
-    headers: { 'Content-Type': 'application/json' },
+  await fetchJson(url, {
+    method,
+    headers: { 'Content-Type': 'application/json', ...authHeaders() },
     body: JSON.stringify(data)
-  })
-  .then(r => {
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    return r.json();
-  })
-  .then(() => {
-    resetFormState(e.target);
-    loadAkce();
-  })
-  .catch(err => {
-    console.error('Chyba ukládání:', err);
   });
+
+  resetFormState(e.target);
+  eventFormVisible = false;
+  updateEventFormState();
+  loadAkce();
 });
 
-// =====================
-// EDIT
-// =====================
 function editAkce(a) {
+  eventFormVisible = true;
+  updateEventFormState();
   editingId = a.id;
   editingPublic = HejaEvents.isPublicEvent(a) ? 1 : 0;
-
   document.getElementById('nazev').value = a.nazev;
   document.getElementById('datum').value = a.datum;
   document.getElementById('cas').value = a.cas || '';
   document.getElementById('misto').value = a.misto || '';
   document.getElementById('popis').value = a.popis || '';
-
   document.getElementById('edit-info').style.display = 'block';
   document.getElementById('submit-btn').textContent = 'Uložit změny';
-
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// =====================
-// DELETE
-// =====================
-function deleteAkce(id) {
+async function deleteAkce(id) {
   if (!confirm('Opravdu smazat?')) return;
-
-  fetch(`${API}/${id}`, { method: 'DELETE' })
-    .then(r => {
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
-    })
-    .then(() => {
-      if (editingId === id) {
-        resetFormState(document.getElementById('akce-form'));
-      }
-      loadAkce();
-    })
-    .catch(err => {
-      console.error('Chyba mazání:', err);
-    });
+  await fetchJson(`${EVENTS_API}/${id}`, { method: 'DELETE', headers: authHeaders() });
+  if (editingId === id) resetFormState(document.getElementById('akce-form'));
+  loadAkce();
 }
 
+async function fetchJson(url, options = {}) {
+  const res = await fetch(url, options);
+  const text = await res.text();
+  let payload = null;
+
+  if (text) {
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = { error: text };
+    }
+  }
+
+  if (!res.ok) {
+    const message = payload && payload.error ? payload.error : `HTTP ${res.status}`;
+    const error = new Error(message);
+    error.status = res.status;
+    error.payload = payload;
+    throw error;
+  }
+
+  return payload;
+}
 </script>
 
 </body>
