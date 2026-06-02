@@ -41,7 +41,10 @@
 
 <div id="main">
   <div class="inner">
-    <h1>Naše akce</h1>
+    <div class="page-title-row">
+      <h1>Naše akce</h1>
+      <button id="logout-btn" class="button small" style="display:none;">Odhlásit</button>
+    </div>
 
     <section id="login-section">
       <h2>Přihlášení členů</h2>
@@ -54,51 +57,52 @@
     </section>
 
     <section id="content-section" style="display:none;">
-      <div class="member-topbar">
-        <button id="logout-btn" class="button small">Odhlásit</button>
-      </div>
-
-      <section id="account-card" class="account-card" aria-live="polite">
-        <div class="account-summary">
-          <div class="account-main">
-            <div class="account-icon" aria-hidden="true">💰</div>
-            <div class="account-label">Stav našeho účtu</div>
-          </div>
-          <button type="button" id="account-toggle" class="account-toggle">Zobrazit stav účtu</button>
-        </div>
-
-        <div id="account-details" class="account-details" style="display:none;">
-          <div id="account-balance" class="account-balance">Načítám…</div>
-          <div id="account-updated" class="account-updated"></div>
-          <form id="account-form" class="account-form" style="display:none;">
-            <label for="account-amount">Nový stav</label>
-            <div class="account-input-row">
-              <input type="number" id="account-amount" placeholder="Částka" step="1" inputmode="numeric" required>
-              <span class="account-currency">Kč</span>
-              <button type="submit" id="account-submit-btn">Uložit</button>
+      <nav class="action-menu" aria-label="Možnosti stránky">
+        <button type="button" id="account-toggle" class="action-menu-item" aria-expanded="false" aria-controls="account-details">
+          <span>Stav účtu</span>
+          <span class="action-menu-hint">zobrazit</span>
+        </button>
+        <div id="account-details" class="action-panel account-panel">
+          <section id="account-card" class="account-card" aria-live="polite">
+            <div class="account-summary">
+              <div class="account-main">
+                <div class="account-icon" aria-hidden="true">💰</div>
+                <div>
+                  <div class="account-label">Stav našeho účtu</div>
+                  <div id="account-balance" class="account-balance">Načítám…</div>
+                </div>
+              </div>
+              <div id="account-updated" class="account-updated"></div>
             </div>
-          </form>
-          <p id="account-feedback" class="account-feedback" style="display:none;"></p>
+            <form id="account-form" class="account-form" style="display:none;">
+              <label for="account-amount">Nový stav</label>
+              <div class="account-input-row">
+                <input type="number" id="account-amount" placeholder="Částka" step="1" inputmode="numeric" required>
+                <span class="account-currency">Kč</span>
+                <button type="submit" id="account-submit-btn">Uložit</button>
+              </div>
+            </form>
+            <p id="account-feedback" class="account-feedback" style="display:none;"></p>
+          </section>
         </div>
-      </section>
 
-      <div id="admin-actions" class="admin-actions" style="display:none;">
-        <button type="button" id="event-form-toggle" class="event-form-toggle">Přidat akci</button>
-      </div>
-
-      <section id="admin-form-section" class="admin-form-section" style="display:none;">
-        <h2>Přidat / upravit akci</h2>
-        <p id="edit-info" style="display:none;">✏️ Upravuji existující akci</p>
-        <form id="akce-form">
-          <input type="text" id="nazev" placeholder="Název" required>
-          <input type="date" id="datum" required>
-          <input type="time" id="cas">
-          <input type="text" id="misto" placeholder="Místo">
-          <textarea id="popis" placeholder="Popis"></textarea>
-          <button type="submit" id="submit-btn">Uložit akci</button>
-        </form>
-        <hr>
-      </section>
+        <button type="button" id="event-form-toggle" class="action-menu-item" aria-expanded="false" aria-controls="admin-form-section" style="display:none;">
+          <span>Přidat akci</span>
+          <span class="action-menu-hint">otevřít</span>
+        </button>
+        <section id="admin-form-section" class="action-panel admin-form-section">
+          <h2>Přidat / upravit akci</h2>
+          <p id="edit-info" style="display:none;">✏️ Upravuji existující akci</p>
+          <form id="akce-form">
+            <input type="text" id="nazev" placeholder="Název" required>
+            <input type="date" id="datum" required>
+            <input type="time" id="cas">
+            <input type="text" id="misto" placeholder="Místo">
+            <textarea id="popis" placeholder="Popis"></textarea>
+            <button type="submit" id="submit-btn">Uložit akci</button>
+          </form>
+        </section>
+      </nav>
 
       <section>
         <div class="section-title primary-section-title">📅 Akce</div>
@@ -169,7 +173,8 @@ function setLoggedInState() {
   document.getElementById('content-section').style.display = 'block';
 
   const admin = currentUser.role === 'admin';
-  document.getElementById('admin-actions').style.display = admin ? 'flex' : 'none';
+  document.getElementById('logout-btn').style.display = 'inline-block';
+  document.getElementById('event-form-toggle').style.display = admin ? 'flex' : 'none';
   document.getElementById('account-form').style.display = admin ? 'flex' : 'none';
   updateAccountPanelState();
   updateEventFormState();
@@ -215,8 +220,10 @@ function updateAccountPanelState() {
   const toggle = document.getElementById('account-toggle');
   const admin = currentUser && currentUser.role === 'admin';
 
-  details.style.display = accountExpanded ? 'block' : 'none';
-  toggle.textContent = accountExpanded ? 'Skrýt stav účtu' : (admin ? 'Zobrazit / upravit stav' : 'Zobrazit stav účtu');
+  details.classList.toggle('is-open', accountExpanded);
+  toggle.classList.toggle('is-open', accountExpanded);
+  toggle.setAttribute('aria-expanded', accountExpanded ? 'true' : 'false');
+  toggle.querySelector('.action-menu-hint').textContent = accountExpanded ? 'skrýt' : (admin ? 'zobrazit / upravit' : 'zobrazit');
 }
 
 document.getElementById('account-toggle').addEventListener('click', () => {
@@ -229,8 +236,12 @@ function updateEventFormState() {
   const formSection = document.getElementById('admin-form-section');
   const toggle = document.getElementById('event-form-toggle');
 
-  formSection.style.display = admin && eventFormVisible ? 'block' : 'none';
-  if (toggle) toggle.textContent = eventFormVisible ? 'Skrýt formulář' : 'Přidat akci';
+  formSection.classList.toggle('is-open', admin && eventFormVisible);
+  if (toggle) {
+    toggle.classList.toggle('is-open', eventFormVisible);
+    toggle.setAttribute('aria-expanded', eventFormVisible ? 'true' : 'false');
+    toggle.querySelector('.action-menu-hint').textContent = eventFormVisible ? 'skrýt' : 'otevřít';
+  }
 }
 
 document.getElementById('event-form-toggle').addEventListener('click', () => {
