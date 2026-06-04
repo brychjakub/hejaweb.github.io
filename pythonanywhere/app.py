@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from functools import wraps
 from werkzeug.security import check_password_hash
+import os
 import secrets
 import sqlite3
 
@@ -102,6 +103,25 @@ def require_auth(f):
 
     return wrapper
 
+
+
+def require_sync_token(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        if request.method == "OPTIONS":
+            return "", 200
+
+        configured_token = os.environ.get("BACKEND_SYNC_TOKEN", "")
+        provided_token = parse_bearer_token()
+
+        if not configured_token:
+            return jsonify({"error": "Backend sync token is not configured"}), 503
+        if not provided_token or not secrets.compare_digest(provided_token, configured_token):
+            return jsonify({"error": "Unauthorized"}), 401
+
+        return f(*args, **kwargs)
+
+    return wrapper
 
 def require_admin(f):
     @wraps(f)
@@ -215,6 +235,38 @@ def update_account_balance():
 
     payload = get_account_payload()
     payload["status"] = "updated"
+
+    return jsonify(payload)
+
+
+# GET/POST – automaticka synchronizace stavu uctu
+@app.route("/api/account/sync", methods=["GET", "POST", "OPTIONS"])
+@require_sync_token
+def sync_account_balance():
+    if request.method == "GET":
+        payload = get_account_payload()
+        payload["status"] = "verified"
+        return jsonify(payload)
+
+    data = request.get_json() or {}
+
+    try:
+        amount_czk = int(data.get("amount_czk"))
+    except (TypeError, ValueError):
+        return jsonify({"error": "Neplatna castka"}), 400
+
+    ensure_account_balance_table()
+    query(
+        """
+        UPDATE account_balance
+        SET amount_czk = ?, updated_by = NULL, updated_at = CURRENT_TIMESTAMP
+        WHERE id = 1
+        """,
+        (amount_czk,),
+    )
+
+    payload = get_account_payload()
+    payload["status"] = "synced"
 
     return jsonify(payload)
 
