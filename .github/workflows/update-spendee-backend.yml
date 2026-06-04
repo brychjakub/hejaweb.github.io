@@ -26,6 +26,5 @@ jobs:
           SPENDEE_DEVICE_UUID: ${{ secrets.SPENDEE_DEVICE_UUID }}
           SPENDEE_WALLET_ID: ${{ secrets.SPENDEE_WALLET_ID }}
           BACKEND_API_BASE: ${{ secrets.BACKEND_API_BASE }}
-          BACKEND_USERNAME: ${{ secrets.BACKEND_USERNAME }}
-          BACKEND_PASSWORD: ${{ secrets.BACKEND_PASSWORD }}
+          BACKEND_SYNC_TOKEN: ${{ secrets.BACKEND_SYNC_TOKEN }}
         run: python scripts/update_spendee_backend.py

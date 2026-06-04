@@ -1,6 +1,6 @@
 # Automatická aktualizace Spendee zůstatku do PythonAnywhere backendu
 
-Script `scripts/update_spendee_backend.py` načte seznam Spendee peněženek, najde peněženku podle `SPENDEE_WALLET_ID` a zapíše její zůstatek do PythonAnywhere endpointu `/api/account`. Web už stav účtu načítá z backendu, takže není potřeba mezikrok přes Google Sheets.
+Script `scripts/update_spendee_backend.py` načte seznam Spendee peněženek, najde peněženku podle `SPENDEE_WALLET_ID` a zapíše její zůstatek do PythonAnywhere endpointu `/api/account/sync`. Web už stav účtu načítá z backendu, takže není potřeba mezikrok přes Google Sheets.
 
 ## Požadované proměnné prostředí
 
@@ -8,10 +8,9 @@ Script `scripts/update_spendee_backend.py` načte seznam Spendee peněženek, na
 - `SPENDEE_DEVICE_UUID` – hodnota hlavičky `device-uuid`.
 - `SPENDEE_WALLET_ID` – ID peněženky ve Spendee.
 - `BACKEND_API_BASE` – base URL backend API, například `https://hejaboys.pythonanywhere.com/api`.
-- `BACKEND_USERNAME` – administrátorské uživatelské jméno pro backend.
-- `BACKEND_PASSWORD` – heslo administrátorského účtu pro backend.
+- `BACKEND_SYNC_TOKEN` – sdílený tajný token pro endpoint `/api/account/sync`; stejnou hodnotu nastavte i na PythonAnywhere jako environment variable `BACKEND_SYNC_TOKEN`.
 
-Backend účet musí mít roli `admin`, protože endpoint `/api/account` přijímá změny jen od admina.
+Endpoint `/api/account/sync` je chráněný tímto tokenem, takže workflow nepotřebuje heslo žádného uživatelského účtu.
 
 ## Lokální spuštění
 
@@ -23,8 +22,7 @@ export SPENDEE_TOKEN="..."
 export SPENDEE_DEVICE_UUID="..."
 export SPENDEE_WALLET_ID="..."
 export BACKEND_API_BASE="https://hejaboys.pythonanywhere.com/api"
-export BACKEND_USERNAME="..."
-export BACKEND_PASSWORD="..."
+export BACKEND_SYNC_TOKEN="..."
 python scripts/update_spendee_backend.py
 ```
 
@@ -32,4 +30,4 @@ python scripts/update_spendee_backend.py
 
 Workflow `.github/workflows/update-spendee-backend.yml` běží denně v 06:00 UTC a lze ho spustit ručně přes `workflow_dispatch`. Hodnoty proměnných nastavte jako repository secrets se stejnými názvy jako výše.
 
-Script záměrně nevypisuje tokeny, hesla, session tokeny ani wallet data.
+Script záměrně nevypisuje tokeny ani wallet data.

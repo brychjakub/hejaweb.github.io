@@ -6,8 +6,7 @@ Required environment variables:
 - SPENDEE_DEVICE_UUID
 - SPENDEE_WALLET_ID
 - BACKEND_API_BASE
-- BACKEND_USERNAME
-- BACKEND_PASSWORD
+- BACKEND_SYNC_TOKEN
 """
 
 from __future__ import annotations
@@ -50,8 +49,7 @@ def load_config() -> dict[str, str]:
         "spendee_device_uuid": _required_env("SPENDEE_DEVICE_UUID"),
         "spendee_wallet_id": _required_env("SPENDEE_WALLET_ID"),
         "backend_api_base": backend_api_base,
-        "backend_username": _required_env("BACKEND_USERNAME"),
-        "backend_password": _required_env("BACKEND_PASSWORD"),
+        "backend_sync_token": _required_env("BACKEND_SYNC_TOKEN"),
     }
 
 
@@ -134,98 +132,70 @@ def to_backend_amount_czk(balance: Decimal) -> int:
     return int(balance.quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
 
-def login_to_backend(api_base: str, username: str, password: str) -> str:
-    """Login to PythonAnywhere and return an API session token."""
-    try:
-        response = requests.post(
-            f"{api_base}/auth/login",
-            json={"username": username, "password": password},
-            timeout=30,
-        )
-    except requests.RequestException as exc:
-        raise BackendError("Could not connect to the backend login endpoint.") from exc
-
-    if not response.ok:
-        raise BackendError(f"Backend login returned HTTP {response.status_code}.")
-
-    try:
-        payload = response.json()
-    except ValueError as exc:
-        raise BackendError("Backend login returned invalid JSON.") from exc
-
-    token = payload.get("token") if isinstance(payload, dict) else None
-    if not isinstance(token, str) or not token:
-        raise BackendError("Backend login response does not contain a session token.")
-
-    user = payload.get("user")
-    role = user.get("role") if isinstance(user, dict) else None
-    if role != "admin":
-        raise BackendError("Backend login user is not an admin.")
-
-    return token
-
-
-def _parse_backend_account_response(response: requests.Response, expected_amount_czk: int) -> dict[str, Any]:
+def _parse_backend_account_response(
+    response: requests.Response,
+    expected_amount_czk: int,
+    expected_status: str,
+) -> dict[str, Any]:
     """Parse and verify that the backend confirmed the expected account balance."""
     try:
         payload = response.json()
     except ValueError as exc:
-        raise BackendError("Backend account endpoint returned invalid JSON.") from exc
+        raise BackendError("Backend account sync endpoint returned invalid JSON.") from exc
 
     if not isinstance(payload, dict):
-        raise BackendError("Backend account endpoint did not return a JSON object.")
+        raise BackendError("Backend account sync endpoint did not return a JSON object.")
 
     try:
         returned_amount = int(payload.get("amount_czk"))
     except (TypeError, ValueError) as exc:
-        raise BackendError("Backend account endpoint did not return a valid amount_czk.") from exc
+        raise BackendError("Backend account sync endpoint did not return a valid amount_czk.") from exc
 
     if returned_amount != expected_amount_czk:
-        raise BackendError("Backend account endpoint confirmed a different amount than requested.")
+        raise BackendError("Backend account sync endpoint confirmed a different amount than requested.")
+    if payload.get("status") != expected_status:
+        raise BackendError("Backend account sync endpoint did not return the expected status.")
 
     return payload
 
 
-def update_backend_account(api_base: str, session_token: str, amount_czk: int) -> dict[str, Any]:
-    """Update the PythonAnywhere account balance endpoint and verify the response."""
-    headers = {"Authorization": f"Bearer {session_token}"}
+def sync_backend_account(api_base: str, sync_token: str, amount_czk: int) -> dict[str, Any]:
+    """Update the PythonAnywhere sync endpoint and verify the response."""
+    headers = {"Authorization": f"Bearer {sync_token}"}
 
     try:
-        response = requests.put(
-            f"{api_base}/account",
+        response = requests.post(
+            f"{api_base}/account/sync",
             headers=headers,
             json={"amount_czk": amount_czk},
             timeout=30,
         )
     except requests.RequestException as exc:
-        raise BackendError("Could not connect to the backend account endpoint.") from exc
+        raise BackendError("Could not connect to the backend account sync endpoint.") from exc
 
     if not response.ok:
-        raise BackendError(f"Backend account update returned HTTP {response.status_code}.")
+        raise BackendError(f"Backend account sync returned HTTP {response.status_code}.")
 
-    payload = _parse_backend_account_response(response, amount_czk)
-    if payload.get("status") != "updated":
-        raise BackendError("Backend account endpoint did not confirm update status.")
-    return payload
+    return _parse_backend_account_response(response, amount_czk, "synced")
 
 
-def verify_backend_account(api_base: str, session_token: str, amount_czk: int) -> dict[str, Any]:
-    """Read the account endpoint after update and verify the stored value."""
-    headers = {"Authorization": f"Bearer {session_token}"}
+def verify_backend_account(api_base: str, sync_token: str, amount_czk: int) -> dict[str, Any]:
+    """Read the sync endpoint after update and verify the stored value."""
+    headers = {"Authorization": f"Bearer {sync_token}"}
 
     try:
         response = requests.get(
-            f"{api_base}/account",
+            f"{api_base}/account/sync",
             headers=headers,
             timeout=30,
         )
     except requests.RequestException as exc:
-        raise BackendError("Could not connect to the backend account verification endpoint.") from exc
+        raise BackendError("Could not connect to the backend account sync verification endpoint.") from exc
 
     if not response.ok:
-        raise BackendError(f"Backend account verification returned HTTP {response.status_code}.")
+        raise BackendError(f"Backend account sync verification returned HTTP {response.status_code}.")
 
-    return _parse_backend_account_response(response, amount_czk)
+    return _parse_backend_account_response(response, amount_czk, "verified")
 
 
 def run() -> None:
@@ -235,16 +205,20 @@ def run() -> None:
     balance, currency = extract_balance_and_currency(wallet)
     validate_czk_currency(currency)
     amount_czk = to_backend_amount_czk(balance)
-    session_token = login_to_backend(
-        config["backend_api_base"],
-        config["backend_username"],
-        config["backend_password"],
-    )
+
     print(f"Using backend API base: {config['backend_api_base']}")
-    update_payload = update_backend_account(config["backend_api_base"], session_token, amount_czk)
-    verify_payload = verify_backend_account(config["backend_api_base"], session_token, amount_czk)
-    updated_at = verify_payload.get("updated_at") or update_payload.get("updated_at") or "unknown time"
-    print(f"Updated and verified PythonAnywhere account balance successfully at {updated_at}.")
+    sync_payload = sync_backend_account(
+        config["backend_api_base"],
+        config["backend_sync_token"],
+        amount_czk,
+    )
+    verify_payload = verify_backend_account(
+        config["backend_api_base"],
+        config["backend_sync_token"],
+        amount_czk,
+    )
+    updated_at = verify_payload.get("updated_at") or sync_payload.get("updated_at") or "unknown time"
+    print(f"Synced amount_czk={amount_czk} and verified PythonAnywhere backend at {updated_at}.")
 
 
 def main() -> int:
