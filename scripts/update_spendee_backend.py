@@ -159,6 +159,14 @@ def _parse_backend_account_response(
     return payload
 
 
+def _response_error_detail(response: requests.Response) -> str:
+    """Return a short non-secret response detail for easier backend debugging."""
+    body = response.text.strip().replace("\n", " ")
+    if not body:
+        return ""
+    return f" Response body: {body[:300]}"
+
+
 def sync_backend_account(api_base: str, sync_token: str, amount_czk: int) -> dict[str, Any]:
     """Update the PythonAnywhere sync endpoint and verify the response."""
     headers = {"Authorization": f"Bearer {sync_token}"}
@@ -174,7 +182,10 @@ def sync_backend_account(api_base: str, sync_token: str, amount_czk: int) -> dic
         raise BackendError("Could not connect to the backend account sync endpoint.") from exc
 
     if not response.ok:
-        raise BackendError(f"Backend account sync returned HTTP {response.status_code}.")
+        raise BackendError(
+            f"Backend account sync returned HTTP {response.status_code}."
+            f"{_response_error_detail(response)}"
+        )
 
     return _parse_backend_account_response(response, amount_czk, "synced")
 
@@ -193,7 +204,10 @@ def verify_backend_account(api_base: str, sync_token: str, amount_czk: int) -> d
         raise BackendError("Could not connect to the backend account sync verification endpoint.") from exc
 
     if not response.ok:
-        raise BackendError(f"Backend account sync verification returned HTTP {response.status_code}.")
+        raise BackendError(
+            f"Backend account sync verification returned HTTP {response.status_code}."
+            f"{_response_error_detail(response)}"
+        )
 
     return _parse_backend_account_response(response, amount_czk, "verified")
 

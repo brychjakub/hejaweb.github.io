@@ -259,7 +259,7 @@ def sync_account_balance():
     query(
         """
         UPDATE account_balance
-        SET amount_czk = ?, updated_by = NULL, updated_at = CURRENT_TIMESTAMP
+        SET amount_czk = ?, updated_at = CURRENT_TIMESTAMP
         WHERE id = 1
         """,
         (amount_czk,),
