@@ -2,12 +2,15 @@
 """Update the PythonAnywhere account balance from a Spendee wallet.
 
 Required environment variables:
-- SPENDEE_TOKEN
 - SPENDEE_DEVICE_UUID
 - SPENDEE_WALLET_ID
 - BACKEND_API_BASE
 - BACKEND_USERNAME
 - BACKEND_PASSWORD
+
+Spendee auth can be configured in either of these ways:
+- SPENDEE_TOKEN
+- SPENDEE_TOKEN_URL + SPENDEE_REFRESH_TOKEN
 """
 
 from __future__ import annotations
@@ -45,14 +48,84 @@ def load_config() -> dict[str, str]:
     """Load required configuration without printing secret values."""
     backend_api_base = _required_env("BACKEND_API_BASE").rstrip("/")
 
+    spendee_token = os.environ.get("SPENDEE_TOKEN", "").strip()
+    spendee_token_url = os.environ.get("SPENDEE_TOKEN_URL", "").strip()
+    spendee_refresh_token = os.environ.get("SPENDEE_REFRESH_TOKEN", "").strip()
+
+    if not spendee_token and not (spendee_token_url and spendee_refresh_token):
+        raise ConfigError(
+            "Missing Spendee auth configuration: set SPENDEE_TOKEN or both "
+            "SPENDEE_TOKEN_URL and SPENDEE_REFRESH_TOKEN."
+        )
+
     return {
-        "spendee_token": _required_env("SPENDEE_TOKEN"),
+        "spendee_token": spendee_token,
+        "spendee_token_url": spendee_token_url,
+        "spendee_refresh_token": spendee_refresh_token,
+        "spendee_client_id": os.environ.get("SPENDEE_CLIENT_ID", "").strip(),
+        "spendee_client_secret": os.environ.get("SPENDEE_CLIENT_SECRET", "").strip(),
+        "spendee_token_auth_mode": os.environ.get("SPENDEE_TOKEN_AUTH_MODE", "body").strip().lower(),
         "spendee_device_uuid": _required_env("SPENDEE_DEVICE_UUID"),
         "spendee_wallet_id": _required_env("SPENDEE_WALLET_ID"),
         "backend_api_base": backend_api_base,
         "backend_username": _required_env("BACKEND_USERNAME"),
         "backend_password": _required_env("BACKEND_PASSWORD"),
     }
+
+
+def refresh_spendee_access_token(config: dict[str, str]) -> str:
+    """Refresh and return a Spendee access token using an OAuth refresh token."""
+    token_url = config["spendee_token_url"]
+    refresh_token = config["spendee_refresh_token"]
+    if not token_url or not refresh_token:
+        return config["spendee_token"]
+
+    data = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+    }
+    auth = None
+
+    client_id = config["spendee_client_id"]
+    client_secret = config["spendee_client_secret"]
+    auth_mode = config["spendee_token_auth_mode"]
+
+    if client_id and client_secret and auth_mode == "basic":
+        auth = (client_id, client_secret)
+    else:
+        if client_id:
+            data["client_id"] = client_id
+        if client_secret:
+            data["client_secret"] = client_secret
+
+    headers = {
+        "accept": "application/json",
+        "device-uuid": config["spendee_device_uuid"],
+        "spendee-platform": "web",
+        "spendee-version": "master",
+    }
+
+    try:
+        response = requests.post(token_url, data=data, headers=headers, auth=auth, timeout=30)
+    except requests.RequestException as exc:
+        raise SpendeeError("Could not connect to the Spendee token refresh endpoint.") from exc
+
+    if not response.ok:
+        raise SpendeeError(
+            f"Spendee token refresh returned HTTP {response.status_code}."
+            f"{_response_error_detail(response)}"
+        )
+
+    try:
+        payload = response.json()
+    except ValueError as exc:
+        raise SpendeeError("Spendee token refresh returned invalid JSON.") from exc
+
+    access_token = payload.get("access_token") if isinstance(payload, dict) else None
+    if not isinstance(access_token, str) or not access_token:
+        raise SpendeeError("Spendee token refresh response does not contain an access_token.")
+
+    return access_token
 
 
 def fetch_wallets(token: str, device_uuid: str) -> list[dict[str, Any]]:
@@ -247,7 +320,8 @@ def verify_backend_account(api_base: str, session_token: str, amount_czk: int) -
 
 def run() -> None:
     config = load_config()
-    wallets = fetch_wallets(config["spendee_token"], config["spendee_device_uuid"])
+    spendee_access_token = refresh_spendee_access_token(config)
+    wallets = fetch_wallets(spendee_access_token, config["spendee_device_uuid"])
     wallet = find_wallet(wallets, config["spendee_wallet_id"])
     balance, currency = extract_balance_and_currency(wallet)
     validate_czk_currency(currency)

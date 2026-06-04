@@ -23,6 +23,11 @@ jobs:
       - name: Update PythonAnywhere backend
         env:
           SPENDEE_TOKEN: ${{ secrets.SPENDEE_TOKEN }}
+          SPENDEE_TOKEN_URL: ${{ secrets.SPENDEE_TOKEN_URL }}
+          SPENDEE_REFRESH_TOKEN: ${{ secrets.SPENDEE_REFRESH_TOKEN }}
+          SPENDEE_CLIENT_ID: ${{ secrets.SPENDEE_CLIENT_ID }}
+          SPENDEE_CLIENT_SECRET: ${{ secrets.SPENDEE_CLIENT_SECRET }}
+          SPENDEE_TOKEN_AUTH_MODE: ${{ secrets.SPENDEE_TOKEN_AUTH_MODE }}
           SPENDEE_DEVICE_UUID: ${{ secrets.SPENDEE_DEVICE_UUID }}
           SPENDEE_WALLET_ID: ${{ secrets.SPENDEE_WALLET_ID }}
           BACKEND_API_BASE: ${{ secrets.BACKEND_API_BASE }}
