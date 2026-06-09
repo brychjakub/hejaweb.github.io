@@ -190,6 +190,31 @@ button:hover {
   font-weight: 800;
 }
 
+.account-side {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.85em;
+}
+
+.account-qr-link {
+  display: block;
+  flex: 0 0 auto;
+  line-height: 0;
+}
+
+.account-qr {
+  display: block;
+  width: 4.6em;
+  height: 4.6em;
+  padding: 0.28em;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 10px;
+  background: #fff;
+  object-fit: contain;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
 .account-updated {
   max-width: 15em;
   text-align: right;
@@ -292,6 +317,7 @@ button:hover {
 @media screen and (max-width: 736px) {
   .page-title-row,
   .account-summary,
+  .account-side,
   .account-form,
   .past-section-header {
     flex-direction: column;
@@ -307,6 +333,10 @@ button:hover {
   .account-form button {
     width: 100%;
     max-width: none;
+  }
+
+  .account-side {
+    width: 100%;
   }
 
   .account-updated {
