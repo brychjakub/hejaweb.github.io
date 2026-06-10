@@ -1,4 +1,7 @@
 (function () {
+  const API_BASE = 'https://hejaboys.pythonanywhere.com/api';
+  const PUBLIC_EVENTS_API = `${API_BASE}/akce?public=true`;
+
   function isPublicEvent(event) {
     return Number(event.public) === 1;
   }
@@ -57,11 +60,72 @@
     return html;
   }
 
+  function publicUpcomingEvents(events, now = new Date()) {
+    return events
+      .filter((event) => isPublicEvent(event) && toEventDayEnd(event) >= now)
+      .sort((a, b) => toEventDate(a) - toEventDate(b));
+  }
+
+  function splitPublicEvents(events, now = new Date()) {
+    const current = [];
+    const past = [];
+
+    events.filter(isPublicEvent).forEach((event) => {
+      if (toEventDayEnd(event) >= now) current.push(event);
+      else past.push(event);
+    });
+
+    current.sort((a, b) => toEventDate(a) - toEventDate(b));
+    past.sort((a, b) => toEventDate(b) - toEventDate(a));
+
+    return { current, past };
+  }
+
+  function renderDescription(description, options = {}) {
+    if (!description) return '';
+
+    const {
+      className = 'event-description',
+      prefix = '<br/>',
+      linkStyle = ''
+    } = options;
+
+    return `${prefix}<span class="${escapeHtml(className)}">${parseLinks(description, { linkStyle })}</span>`;
+  }
+
+  function renderEventSummary(event, options = {}) {
+    const {
+      timePrefix = ' v ',
+      locationPrefix = ', ',
+      descriptionPrefix = '<br/>',
+      ctaHref = '',
+      ctaText = '',
+      ctaSuffix = ''
+    } = options;
+
+    const time = event.cas ? `${timePrefix}${escapeHtml(event.cas)}` : '';
+    const location = event.misto ? `${locationPrefix}${escapeHtml(event.misto)}` : '';
+    const description = renderDescription(event.popis, { prefix: descriptionPrefix });
+    const cta = ctaHref && ctaText ? `<br/><a href="${escapeHtml(ctaHref)}">${escapeHtml(ctaText)}</a>${escapeHtml(ctaSuffix)}` : '';
+
+    return `
+      <strong>${escapeHtml(event.nazev)}</strong><br/>
+      ${formatDate(event.datum)}${time}${location}${description}${cta}
+    `;
+  }
+
   window.HejaEvents = {
+    API_BASE,
+    PUBLIC_EVENTS_API,
     isPublicEvent,
     toEventDate,
     toEventDayEnd,
     formatDate,
-    parseLinks
+    escapeHtml,
+    parseLinks,
+    publicUpcomingEvents,
+    splitPublicEvents,
+    renderDescription,
+    renderEventSummary
   };
 })();

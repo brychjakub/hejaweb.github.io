@@ -148,36 +148,27 @@
 			<script src="assets/js/events-common.js"></script>
 			<script>
 				document.addEventListener('DOMContentLoaded', function () {
-					const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
 					const cont = document.getElementById('upcoming-content');
 					function renderUpcoming(html) {
 						if (cont) cont.innerHTML = html;
 					}
 
-					fetch(API)
+					fetch(HejaEvents.PUBLIC_EVENTS_API)
 						.then(r => r.json())
 						.then(data => {
-							const now = new Date();
-							const nextEvent = data
-								.filter(a => HejaEvents.isPublicEvent(a) && HejaEvents.toEventDayEnd(a) >= now)
-								.sort((a, b) => HejaEvents.toEventDate(a) - HejaEvents.toEventDate(b))[0];
+							const nextEvent = HejaEvents.publicUpcomingEvents(data)[0];
 
 							if (!nextEvent) {
 								renderUpcoming('<p>Brzy oznámíme další akci. Sledujte <a href="akce.html">Akce</a>.</p>');
 								return;
 							}
 
-							const eventDate = HejaEvents.toEventDate(nextEvent);
-							const dateStr = eventDate.toLocaleDateString('cs-CZ');
-							const timeStr = nextEvent.cas ? ` v ${nextEvent.cas}` : '';
-							const locationStr = nextEvent.misto ? `, ${nextEvent.misto}` : '';
-							const description = nextEvent.popis ? '<br/><span class="event-description">' + HejaEvents.parseLinks(nextEvent.popis) + '</span>' : '';
-
 							renderUpcoming(`
 								<p>
-									<strong>${nextEvent.nazev}</strong><br/>
-									${dateStr}${timeStr}${locationStr}${description}<br/>
-									<a href="akce.html">Všechny akce</a>
+									${HejaEvents.renderEventSummary(nextEvent, {
+										ctaHref: 'akce.html',
+										ctaText: 'Všechny akce'
+									})}
 								</p>
 							`);
 						})
