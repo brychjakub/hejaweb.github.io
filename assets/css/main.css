@@ -3862,3 +3862,8 @@ body.qr-modal-open {
   }
 }
 
+
+.event-description {
+	display: block;
+	white-space: pre-wrap;
+}

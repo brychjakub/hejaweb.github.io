@@ -344,3 +344,18 @@ button:hover {
     text-align: left;
   }
 }
+
+#popis {
+  min-height: 9em;
+}
+
+.event-description {
+  display: block;
+  white-space: pre-wrap;
+}
+
+.form-help {
+  margin: -0.4em 0 0.8em 0;
+  font-size: 0.85em;
+  opacity: 0.68;
+}

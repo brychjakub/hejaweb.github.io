@@ -104,6 +104,7 @@
             <input type="time" id="cas">
             <input type="text" id="misto" placeholder="Místo">
             <textarea id="popis" placeholder="Popis"></textarea>
+            <p class="form-help">Tip: odstavce, odsazení a odrážky piš přímo do popisu – na webu se zachovají.</p>
             <button type="submit" id="submit-btn">Uložit akci</button>
           </form>
         </section>
@@ -415,7 +416,7 @@ function renderList(id, data) {
       </div>
       <div class="akce-meta">${a.misto ? '📍 ' + a.misto : ''}</div>
       <div class="akce-status ${isPublic ? 'public' : 'private'}">${isPublic ? '🌍 Veřejná akce' : '🔒 Interní akce'}</div>
-      <div>${HejaEvents.parseLinks(a.popis || '', { linkStyle: 'color: #00ff64; text-decoration: underline;' })}</div>
+      <div class="event-description">${HejaEvents.parseLinks(a.popis || '', { linkStyle: 'color: #00ff64; text-decoration: underline;' })}</div>
       <div class="akce-actions"></div>
     `;
 

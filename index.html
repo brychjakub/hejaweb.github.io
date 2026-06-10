@@ -64,24 +64,6 @@
  							</div>
  						</section>
 
-						<section class="box support-box" aria-label="Podpora kapely">
-							<div class="support-box__content">
-								<h2>Podpořte nás :-) </h2>
-								<p>Jestli nám chcete přihodit něco na rozvoj kapely, nahrávání, koncerty, struny, benzín nebo jen se zbavit zbytečnýho zůstatku na účtu, tady je cesta.</p>
-							</div>
-							<button type="button" class="support-box__qr-button" aria-haspopup="dialog" aria-controls="qr-modal" aria-label="Zvětšit QR kód pro podporu kapely">
-								<img src="images/qr_code.jpg" alt="QR kód pro příspěvek na rozvoj kapely" class="support-box__qr" />
-								<span>Kliknutím se QR kód zvětší</span>
-							</button>
-						</section>
-
-						<div class="qr-modal" id="qr-modal" role="dialog" aria-modal="true" aria-labelledby="qr-modal-title" hidden>
-							<div class="qr-modal__panel" role="document">
-								<button type="button" class="qr-modal__close" aria-label="Zavřít zvětšený QR kód">&times;</button>
-								<h2 id="qr-modal-title">Díky!</h2>
-								<img src="images/qr_code.jpg" alt="Zvětšený QR kód pro příspěvek na rozvoj kapely" class="qr-modal__image" />
-							</div>
-						</div>
 
  						<section class="tiles">
 							<article>
@@ -167,46 +149,6 @@
 				document.addEventListener('DOMContentLoaded', function () {
 					const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
 					const cont = document.getElementById('upcoming-content');
-					const qrModal = document.getElementById('qr-modal');
-					const qrButton = document.querySelector('.support-box__qr-button');
-					const qrClose = qrModal ? qrModal.querySelector('.qr-modal__close') : null;
-					let lastFocusedElement = null;
-
-					function openQrModal() {
-						if (!qrModal) return;
-						lastFocusedElement = document.activeElement;
-						qrModal.hidden = false;
-						document.body.classList.add('qr-modal-open');
-						if (qrClose) qrClose.focus();
-					}
-
-					function closeQrModal() {
-						if (!qrModal || qrModal.hidden) return;
-						qrModal.hidden = true;
-						document.body.classList.remove('qr-modal-open');
-						if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
-							lastFocusedElement.focus();
-						}
-					}
-
-					if (qrButton) {
-						qrButton.addEventListener('click', openQrModal);
-					}
-
-					if (qrClose) {
-						qrClose.addEventListener('click', closeQrModal);
-					}
-
-					if (qrModal) {
-						qrModal.addEventListener('click', function (event) {
-							if (event.target === qrModal) closeQrModal();
-						});
-					}
-
-					document.addEventListener('keydown', function (event) {
-						if (event.key === 'Escape') closeQrModal();
-					});
-
 					function renderUpcoming(html) {
 						if (cont) cont.innerHTML = html;
 					}
@@ -228,7 +170,7 @@
 							const dateStr = eventDate.toLocaleDateString('cs-CZ');
 							const timeStr = nextEvent.cas ? ` v ${nextEvent.cas}` : '';
 							const locationStr = nextEvent.misto ? `, ${nextEvent.misto}` : '';
-							const description = nextEvent.popis ? '<br/>' + HejaEvents.parseLinks(nextEvent.popis) : '';
+							const description = nextEvent.popis ? '<br/><span class="event-description">' + HejaEvents.parseLinks(nextEvent.popis) + '</span>' : '';
 
 							renderUpcoming(`
 								<p>
