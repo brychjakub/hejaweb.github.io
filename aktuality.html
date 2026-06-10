@@ -64,20 +64,15 @@
 		<script src="assets/js/events-common.js"></script>
 
 		<script>
-			const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
-
 			loadNextEvent();
 
 			function loadNextEvent() {
-				fetch(API)
+				fetch(HejaEvents.PUBLIC_EVENTS_API)
 					.then(r => r.json())
 					.then(data => {
-						const now = new Date();
-						const upcomingEvents = data
-							.filter(a => HejaEvents.isPublicEvent(a) && HejaEvents.toEventDayEnd(a) >= now)
-							.sort((a, b) => HejaEvents.toEventDate(a) - HejaEvents.toEventDate(b));
+						const nextEvent = HejaEvents.publicUpcomingEvents(data)[0];
 
-						if (upcomingEvents.length === 0) {
+						if (!nextEvent) {
 							document.getElementById('next-event').innerHTML = `
 								<strong>Brzy oznámíme</strong><br/>
 								Sledujte tuto stránku pro nové akce.
@@ -85,17 +80,13 @@
 							return;
 						}
 
-						const event = upcomingEvents[0];
-						const eventDate = HejaEvents.toEventDate(event);
-						const dateStr = eventDate.toLocaleDateString('cs-CZ');
-						const timeStr = event.cas ? ` — start ${event.cas}` : '';
-						const location = event.misto ? ` — ${event.misto}` : '';
-
-						document.getElementById('next-event').innerHTML = `
-							<strong>${event.nazev}</strong><br/>
-							${dateStr}${timeStr}${location}${event.popis ? '<br/><span class="event-description">' + HejaEvents.parseLinks(event.popis) + '</span>' : ''}<br/>
-							<a href="akce.html">Více v Akcích</a>.
-						`;
+						document.getElementById('next-event').innerHTML = HejaEvents.renderEventSummary(nextEvent, {
+							timePrefix: ' — start ',
+							locationPrefix: ' — ',
+							ctaHref: 'akce.html',
+							ctaText: 'Více v Akcích',
+							ctaSuffix: '.'
+						});
 					})
 					.catch(err => {
 						console.error('Chyba:', err);

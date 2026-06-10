@@ -138,7 +138,7 @@
 <script src="assets/js/events-common.js"></script>
 
 <script>
-const API_BASE = 'https://hejaboys.pythonanywhere.com/api';
+const API_BASE = HejaEvents.API_BASE;
 const EVENTS_API = `${API_BASE}/akce`;
 const AUTH_API = `${API_BASE}/auth`;
 const ACCOUNT_API = `${API_BASE}/account`;
@@ -412,10 +412,10 @@ function renderList(id, data) {
 
     div.innerHTML = `
       <div class="akce-header">
-        <div class="akce-title">${a.nazev}</div>
-        <div class="akce-date">${HejaEvents.formatDate(a.datum)} ${a.cas ? 'v ' + a.cas : ''}</div>
+        <div class="akce-title">${HejaEvents.escapeHtml(a.nazev)}</div>
+        <div class="akce-date">${HejaEvents.formatDate(a.datum)} ${a.cas ? 'v ' + HejaEvents.escapeHtml(a.cas) : ''}</div>
       </div>
-      <div class="akce-meta">${a.misto ? '📍 ' + a.misto : ''}</div>
+      <div class="akce-meta">${a.misto ? '📍 ' + HejaEvents.escapeHtml(a.misto) : ''}</div>
       <div class="akce-status ${isPublic ? 'public' : 'private'}">${isPublic ? '🌍 Veřejná akce' : '🔒 Interní akce'}</div>
       <div class="event-description">${HejaEvents.parseLinks(a.popis || '', { linkStyle: 'color: #00ff64; text-decoration: underline;' })}</div>
       <div class="akce-actions"></div>

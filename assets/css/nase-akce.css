@@ -349,10 +349,6 @@ button:hover {
   min-height: 9em;
 }
 
-.event-description {
-  display: block;
-  white-space: pre-wrap;
-}
 
 .form-help {
   margin: -0.4em 0 0.8em 0;

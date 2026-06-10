@@ -96,25 +96,13 @@
 		<script src="assets/js/events-common.js"></script>
 
 		<script>
-			const API = 'https://hejaboys.pythonanywhere.com/api/akce?public=true';
-
 			loadAkce();
 
 			function loadAkce() {
-				fetch(API)
+				fetch(HejaEvents.PUBLIC_EVENTS_API)
 					.then(r => r.json())
 					.then(data => {
-						const now = new Date();
-						const current = [];
-						const past = [];
-
-						data
-							.filter(HejaEvents.isPublicEvent)
-							.forEach(a => {
-								const d = HejaEvents.toEventDayEnd(a);
-								if (d >= now) current.push(a);
-								else past.push(a);
-							});
+						const { current, past } = HejaEvents.splitPublicEvents(data);
 
 						renderAkce('current-akce', current);
 						renderAkce('past-akce', past);
@@ -134,9 +122,9 @@
 
 				container.innerHTML = data.map(a => `
 					<li class="akce-item">
-						<strong>${a.nazev}</strong>
-						<div class="akce-meta">📅 ${HejaEvents.formatDate(a.datum)}${a.cas ? ' v ' + a.cas : ''}</div>
-						${a.misto ? '<div class="akce-meta">📍 ' + a.misto + '</div>' : ''}
+						<strong>${HejaEvents.escapeHtml(a.nazev)}</strong>
+						<div class="akce-meta">📅 ${HejaEvents.formatDate(a.datum)}${a.cas ? ' v ' + HejaEvents.escapeHtml(a.cas) : ''}</div>
+						${a.misto ? '<div class="akce-meta">📍 ' + HejaEvents.escapeHtml(a.misto) + '</div>' : ''}
 						${a.popis ? '<div class="akce-popis event-description">' + HejaEvents.parseLinks(a.popis) + '</div>' : ''}
 					</li>
 				`).join('');
