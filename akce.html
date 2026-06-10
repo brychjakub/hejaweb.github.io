@@ -137,7 +137,7 @@
 						<strong>${a.nazev}</strong>
 						<div class="akce-meta">📅 ${HejaEvents.formatDate(a.datum)}${a.cas ? ' v ' + a.cas : ''}</div>
 						${a.misto ? '<div class="akce-meta">📍 ' + a.misto + '</div>' : ''}
-						${a.popis ? '<div class="akce-popis">' + HejaEvents.parseLinks(a.popis) + '</div>' : ''}
+						${a.popis ? '<div class="akce-popis event-description">' + HejaEvents.parseLinks(a.popis) + '</div>' : ''}
 					</li>
 				`).join('');
 			}

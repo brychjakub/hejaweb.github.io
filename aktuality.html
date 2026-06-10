@@ -93,7 +93,7 @@
 
 						document.getElementById('next-event').innerHTML = `
 							<strong>${event.nazev}</strong><br/>
-							${dateStr}${timeStr}${location}${event.popis ? '<br/>' + HejaEvents.parseLinks(event.popis) : ''}<br/>
+							${dateStr}${timeStr}${location}${event.popis ? '<br/><span class="event-description">' + HejaEvents.parseLinks(event.popis) + '</span>' : ''}<br/>
 							<a href="akce.html">Více v Akcích</a>.
 						`;
 					})
