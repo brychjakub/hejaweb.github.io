@@ -32,9 +32,9 @@
 					<li><a href="akce.html">Akce</a></li>
 					<li><a href="alba.html">Alba</a></li>
 					<li><a href="merch.html">Merch</a></li>
-					<li><a href="naseAkce.html">Naše akce</a></li>
 					<li><a href="onas.html">O nás</a></li>
 					<li><a href="pichejte-nas.html">Píchejte nás</a></li>
+					<li><a href="naseAkce.html">Naše akce</a></li>
 				</ul>
 			</nav>
 
@@ -93,7 +93,7 @@
 
 						document.getElementById('next-event').innerHTML = `
 							<strong>${event.nazev}</strong><br/>
-							${dateStr}${timeStr}${location}${event.popis ? '<br/>' + HejaEvents.parseLinks(event.popis) : ''}<br/>
+							${dateStr}${timeStr}${location}${event.popis ? '<br/><span class="event-description">' + HejaEvents.parseLinks(event.popis) + '</span>' : ''}<br/>
 							<a href="akce.html">Více v Akcích</a>.
 						`;
 					})

@@ -59,9 +59,9 @@
 					<li><a href="akce.html">Akce</a></li>
 					<li><a href="alba.html">Alba</a></li>
 					<li><a href="merch.html">Merch</a></li>
-					<li><a href="naseAkce.html">Naše akce</a></li>
 					<li><a href="onas.html">O nás</a></li>
 					<li><a href="pichejte-nas.html">Píchejte nás</a></li>
+					<li><a href="naseAkce.html">Naše akce</a></li>
 				</ul>
 			</nav>
 
@@ -137,7 +137,7 @@
 						<strong>${a.nazev}</strong>
 						<div class="akce-meta">📅 ${HejaEvents.formatDate(a.datum)}${a.cas ? ' v ' + a.cas : ''}</div>
 						${a.misto ? '<div class="akce-meta">📍 ' + a.misto + '</div>' : ''}
-						${a.popis ? '<div class="akce-popis">' + HejaEvents.parseLinks(a.popis) + '</div>' : ''}
+						${a.popis ? '<div class="akce-popis event-description">' + HejaEvents.parseLinks(a.popis) + '</div>' : ''}
 					</li>
 				`).join('');
 			}
